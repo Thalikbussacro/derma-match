@@ -11,4 +11,12 @@ export default defineConfig({
       '/api': { target: 'http://localhost:3000', changeOrigin: true },
     },
   },
+  preview: {
+    // Serve o build (dist) na mesma porta do dev, com o mesmo proxy — mantém o same-site
+    // dos cookies e a origem já liberada no CORS do backend.
+    port: 5173,
+    proxy: {
+      '/api': { target: 'http://localhost:3000', changeOrigin: true },
+    },
+  },
 });
