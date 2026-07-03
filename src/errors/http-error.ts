@@ -10,8 +10,8 @@ export class HttpError extends Error {
 }
 
 export class NotFoundError extends HttpError {
-  constructor(recurso: string) {
-    super(404, 'RECURSO_NAO_ENCONTRADO', `${recurso} não encontrado.`);
+  constructor(recurso: string, codigo = 'RECURSO_NAO_ENCONTRADO') {
+    super(404, codigo, `${recurso} não encontrado.`);
   }
 }
 
