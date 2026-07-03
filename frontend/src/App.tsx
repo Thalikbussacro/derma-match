@@ -6,6 +6,7 @@ import { CadastroPage } from './pages/CadastroPage';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { NotFound } from './pages/NotFound';
+import { QuestionarioPage } from './pages/QuestionarioPage';
 import { RecuperarSenhaPage } from './pages/RecuperarSenhaPage';
 import { RedefinirSenhaPage } from './pages/RedefinirSenhaPage';
 
@@ -40,6 +41,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <HomePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/questionario"
+            element={
+              <RequireAuth>
+                <QuestionarioPage />
               </RequireAuth>
             }
           />
