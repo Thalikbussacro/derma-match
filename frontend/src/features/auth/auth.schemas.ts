@@ -1,13 +1,9 @@
 import { z } from 'zod';
+import type { UsuarioResponse } from '@derma-match/shared';
 
-export const usuarioSchema = z.object({
-  id: z.number(),
-  nome: z.string(),
-  email: z.string(),
-  plano: z.enum(['FREE', 'PREMIUM']),
-  tipoPelePredominanteId: z.number().nullable(),
-});
-export type Usuario = z.infer<typeof usuarioSchema>;
+// O tipo do usuário vem do contrato compartilhado. Os schemas abaixo são de formulário
+// (validação de UI, com confirmação de senha e mensagens em pt) — específicos do frontend.
+export type Usuario = UsuarioResponse;
 
 export const cadastroSchema = z
   .object({

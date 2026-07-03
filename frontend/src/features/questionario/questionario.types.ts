@@ -1,25 +1,8 @@
-export type EstadoNome = 'NAO_INICIADO' | 'EM_ANDAMENTO' | 'CONCLUIDO';
-
-export interface EstadoQuestionario {
-  estado: EstadoNome;
-  perguntasRespondidas: number;
-  totalPerguntas: number;
-  tipoPeleId: number | null;
-}
-
-export interface OpcaoPergunta {
-  id: number;
-  texto: string;
-}
-
-export interface Pergunta {
-  id: number;
-  texto: string;
-  ordem: number;
-  opcoes: OpcaoPergunta[];
-}
-
-export interface ResultadoTipoPele {
-  tipoPeleId: number;
-  tipoPeleNome: string;
-}
+// Tipos do contrato compartilhado, reexportados com os nomes usados no frontend.
+export type {
+  EstadoQuestionarioNome as EstadoNome,
+  EstadoQuestionarioResponse as EstadoQuestionario,
+  OpcaoResponse as OpcaoPergunta,
+  PerguntaResponse as Pergunta,
+  ResultadoTipoPele,
+} from '@derma-match/shared';

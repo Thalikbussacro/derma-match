@@ -1,6 +1,7 @@
+import type { Etapa, ItemRotinaResponse, RotinaResponse } from '@derma-match/shared';
 import { api } from '../../lib/api';
 
-export type Etapa = 'LIMPEZA' | 'TONIFICACAO' | 'HIDRATACAO' | 'PROTECAO_SOLAR' | 'TRATAMENTO';
+export type { Etapa, ItemRotinaResponse as ItemRotina, RotinaResponse as Rotina };
 
 export const ETAPA_LABEL: Record<Etapa, string> = {
   LIMPEZA: 'Limpeza',
@@ -10,23 +11,9 @@ export const ETAPA_LABEL: Record<Etapa, string> = {
   TRATAMENTO: 'Tratamento',
 };
 
-export interface ItemRotina {
-  id: number;
-  etapa: Etapa;
-  descricao: string;
-  ordem: number;
-}
-
-export interface Rotina {
-  id: number;
-  tipoPele: { id: number; nome: string };
-  descricao: string;
-  itens: ItemRotina[];
-}
-
 export const rotinaApi = {
-  async obter(): Promise<Rotina> {
-    const res = await api.get<Rotina>('/rotina');
+  async obter(): Promise<RotinaResponse> {
+    const res = await api.get<RotinaResponse>('/rotina');
     return res.data;
   },
 };

@@ -1,15 +1,11 @@
+import type { PainelUpgradeResponse } from '@derma-match/shared';
 import { api } from '../../lib/api';
 
-export interface PainelUpgrade {
-  titulo: string;
-  descricao: string;
-  beneficios: string[];
-  aviso: string;
-}
+export type { PainelUpgradeResponse as PainelUpgrade };
 
 export const premiumApi = {
-  async obterPainel(): Promise<PainelUpgrade> {
-    const res = await api.get<PainelUpgrade>('/premium/painel-upgrade');
+  async obterPainel(): Promise<PainelUpgradeResponse> {
+    const res = await api.get<PainelUpgradeResponse>('/premium/painel-upgrade');
     return res.data;
   },
 };
