@@ -18,6 +18,12 @@ const envSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(32),
   JWT_ACCESS_EXPIRATION: z.string().default('15m'),
   JWT_REFRESH_EXPIRATION: z.string().default('7d'),
+  SMTP_HOST: z.string().default('localhost'),
+  SMTP_PORT: z.coerce.number().int().positive().default(587),
+  SMTP_USER: z.string().default(''),
+  SMTP_PASS: z.string().default(''),
+  EMAIL_FROM: z.string().default('Derma Match <nao-responda@dermamatch.local>'),
+  APP_URL: z.string().url().default('http://localhost:5173'),
 });
 
 const parsed = envSchema.safeParse(process.env);
