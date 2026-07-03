@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import type { Usuario } from '@prisma/client';
 import { NotFoundError, UnauthorizedError } from '../errors/http-error.js';
+import { removerPastaUsuario } from '../lib/uploads.js';
 import { refreshTokenRepository } from '../repositories/refresh-token.repository.js';
 import { usuarioRepository } from '../repositories/usuario.repository.js';
 import type { UsuarioResponse } from '../schemas/auth.schema.js';
@@ -60,8 +61,10 @@ export const contaService = {
   },
 
   async excluir(usuarioId: number): Promise<void> {
-    // Hard delete: o banco faz cascade nos refresh tokens e tokens de recuperação (onDelete: Cascade).
-    // Quando existir RespostaUsuario (Fase 2), o mesmo cascade cobre as respostas. (RNF-LGPD-002)
+    // Hard delete: o banco faz cascade em refresh tokens, respostas, conversas, mensagens e anexos
+    // (onDelete: Cascade). (RNF-LGPD-002)
     await usuarioRepository.remover(usuarioId);
+    // As fotos da usuária no disco não saem por cascade — removidas explicitamente (LGPD).
+    await removerPastaUsuario(usuarioId);
   },
 };

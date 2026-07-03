@@ -1,7 +1,11 @@
-import type { Conversa } from '@prisma/client';
+import type { Anexo, Conversa } from '@prisma/client';
 import type { ConversaResponse, MensagemResponse } from '@derma-match/shared';
 import { ForbiddenError, NotFoundError } from '../errors/http-error.js';
+import { anexoRepository } from '../repositories/anexo.repository.js';
 import { biomedicaRepository } from '../repositories/biomedica.repository.js';
+
+// Retenção LGPD: fotos expiram 90 dias após o envio (ADR-0011).
+const RETENCAO_ANEXO_MS = 90 * 24 * 60 * 60 * 1000;
 import { conversaRepository } from '../repositories/conversa.repository.js';
 import type { MensagemComAnexos } from '../repositories/mensagem.repository.js';
 import { mensagemRepository } from '../repositories/mensagem.repository.js';
@@ -60,7 +64,11 @@ export const conversaService = {
     return conversaResponse(conversa, biomedica?.nome ?? 'Biomédica');
   },
 
-  async enviarMensagem(usuarioId: number, conteudo: string): Promise<MensagemResponse> {
+  async enviarMensagem(
+    usuarioId: number,
+    conteudo: string,
+    foto?: { caminhoRel: string; tipo: string },
+  ): Promise<MensagemResponse> {
     const { conversa } = await obterOuCriarConversa(usuarioId);
     const mensagem = await mensagemRepository.criar({
       conversaId: conversa.id,
@@ -68,8 +76,19 @@ export const conversaService = {
       autorId: usuarioId,
       conteudo,
     });
+    const anexos: Anexo[] = [];
+    if (foto) {
+      anexos.push(
+        await anexoRepository.criar({
+          mensagemId: mensagem.id,
+          tipo: foto.tipo,
+          caminho: foto.caminhoRel,
+          dataExpiracao: new Date(Date.now() + RETENCAO_ANEXO_MS),
+        }),
+      );
+    }
     await conversaRepository.atualizarUltimaAtividade(conversa.id);
-    return mensagemResponse({ ...mensagem, anexos: [] });
+    return mensagemResponse({ ...mensagem, anexos });
   },
 
   async listarMensagens(usuarioId: number): Promise<MensagemResponse[]> {

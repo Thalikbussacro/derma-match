@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { exigirUsuaria } from '../middlewares/exigir-tipo.js';
+import { anexoRouter } from './anexo.routes.js';
 import { assinaturaRouter } from './assinatura.routes.js';
 import { authRouter } from './auth.routes.js';
 import { biomedicaRouter } from './biomedica.routes.js';
@@ -23,3 +24,5 @@ router.use('/rotina', exigirUsuaria, rotinaRouter);
 router.use('/premium', exigirUsuaria, premiumRouter);
 router.use('/assinatura', exigirUsuaria, assinaturaRouter);
 router.use('/conversa', exigirUsuaria, conversaRouter);
+// Anexos: acessíveis por usuária (dona) e biomédica (da conversa); autorização no service.
+router.use('/anexos', anexoRouter);

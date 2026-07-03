@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
-import { enviarMensagemSchema } from '@derma-match/shared';
+import { ValidationError } from '../errors/http-error.js';
+import { caminhoRelativo } from '../lib/uploads.js';
 import { usuarioIdAutenticado } from '../lib/usuario-autenticado.js';
 import { conversaService } from '../services/conversa.service.js';
 
@@ -31,12 +32,26 @@ export const conversaController = {
     }
   },
 
+  // Recebe multipart: campo "conteudo" (texto) e/ou campo "foto" (imagem, opcional).
   enviarMensagem: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const input = enviarMensagemSchema.parse(req.body);
+      const body = req.body as { conteudo?: unknown };
+      const conteudo = typeof body.conteudo === 'string' ? body.conteudo.trim() : '';
+      const foto = req.file
+        ? { caminhoRel: caminhoRelativo(req.file.path), tipo: req.file.mimetype }
+        : undefined;
+
+      if (!conteudo && !foto) {
+        throw new ValidationError('Escreva uma mensagem ou envie uma foto.', 'MENSAGEM_VAZIA');
+      }
+      if (conteudo.length > 2000) {
+        throw new ValidationError('Mensagem muito longa (máximo 2000 caracteres).');
+      }
+
       const mensagem = await conversaService.enviarMensagem(
         usuarioIdAutenticado(req),
-        input.conteudo,
+        conteudo,
+        foto,
       );
       res.status(201).json(mensagem);
     } catch (err) {
