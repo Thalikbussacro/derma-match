@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import type { EtapaRotina } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -145,6 +146,71 @@ const perguntas: PerguntaDef[] = [
   },
 ];
 
+// Rotinas por tipo de pele (seed data). Conteúdo plausível, não é orientação dermatológica real.
+interface ItemRotinaDef {
+  etapa: EtapaRotina;
+  descricao: string;
+  ordem: number;
+}
+interface RotinaDef {
+  tipo: TipoNome;
+  descricao: string;
+  itens: ItemRotinaDef[];
+}
+
+const rotinas: RotinaDef[] = [
+  {
+    tipo: 'oleosa',
+    descricao: 'Rotina focada em controle de oleosidade e desobstrução dos poros.',
+    itens: [
+      { etapa: 'LIMPEZA', descricao: 'Gel de limpeza com ácido salicílico, de manhã e à noite.', ordem: 1 },
+      { etapa: 'TONIFICACAO', descricao: 'Tônico adstringente sem álcool.', ordem: 2 },
+      { etapa: 'TRATAMENTO', descricao: 'Sérum de niacinamida para controlar a oleosidade.', ordem: 3 },
+      { etapa: 'HIDRATACAO', descricao: 'Hidratante oil-free em gel.', ordem: 4 },
+      { etapa: 'PROTECAO_SOLAR', descricao: 'Protetor solar toque seco FPS 30 ou mais.', ordem: 5 },
+    ],
+  },
+  {
+    tipo: 'seca',
+    descricao: 'Rotina focada em hidratação intensa e reforço da barreira da pele.',
+    itens: [
+      { etapa: 'LIMPEZA', descricao: 'Loção de limpeza suave, sem sabonete.', ordem: 1 },
+      { etapa: 'TRATAMENTO', descricao: 'Sérum de ácido hialurônico antes do hidratante.', ordem: 2 },
+      { etapa: 'HIDRATACAO', descricao: 'Hidratante rico com ceramidas.', ordem: 3 },
+      { etapa: 'PROTECAO_SOLAR', descricao: 'Protetor solar hidratante FPS 30 ou mais.', ordem: 4 },
+    ],
+  },
+  {
+    tipo: 'mista',
+    descricao: 'Rotina equilibrada: controla a zona T sem ressecar as bochechas.',
+    itens: [
+      { etapa: 'LIMPEZA', descricao: 'Gel de limpeza suave.', ordem: 1 },
+      { etapa: 'TONIFICACAO', descricao: 'Tônico equilibrante, com foco na zona T.', ordem: 2 },
+      { etapa: 'HIDRATACAO', descricao: 'Hidratante leve, reforçado nas bochechas.', ordem: 3 },
+      { etapa: 'PROTECAO_SOLAR', descricao: 'Protetor solar FPS 30 ou mais de textura leve.', ordem: 4 },
+    ],
+  },
+  {
+    tipo: 'normal',
+    descricao: 'Rotina de manutenção para pele equilibrada.',
+    itens: [
+      { etapa: 'LIMPEZA', descricao: 'Sabonete facial suave.', ordem: 1 },
+      { etapa: 'HIDRATACAO', descricao: 'Hidratante leve diário.', ordem: 2 },
+      { etapa: 'PROTECAO_SOLAR', descricao: 'Protetor solar FPS 30 ou mais.', ordem: 3 },
+    ],
+  },
+  {
+    tipo: 'sensivel',
+    descricao: 'Rotina suave, com produtos calmantes e sem fragrância.',
+    itens: [
+      { etapa: 'LIMPEZA', descricao: 'Água micelar suave, sem esfregar.', ordem: 1 },
+      { etapa: 'TRATAMENTO', descricao: 'Sérum calmante com niacinamida em baixa concentração.', ordem: 2 },
+      { etapa: 'HIDRATACAO', descricao: 'Hidratante calmante com pantenol, sem fragrância.', ordem: 3 },
+      { etapa: 'PROTECAO_SOLAR', descricao: 'Protetor solar mineral FPS 30 ou mais para peles sensíveis.', ordem: 4 },
+    ],
+  },
+];
+
 async function seedTiposPele(): Promise<Map<TipoNome, number>> {
   for (const tipo of tiposPele) {
     await prisma.tipoPele.upsert({
@@ -212,14 +278,44 @@ async function seedQuestionario(tiposPeleIds: Map<TipoNome, number>): Promise<vo
   }
 }
 
+async function seedRotinas(tiposPeleIds: Map<TipoNome, number>): Promise<void> {
+  for (const rotinaDef of rotinas) {
+    const tipoPeleId = tiposPeleIds.get(rotinaDef.tipo);
+    if (tipoPeleId === undefined) {
+      throw new Error(`Tipo de pele "${rotinaDef.tipo}" não existe (rotina).`);
+    }
+    const rotina = await prisma.rotina.upsert({
+      where: { tipoPeleId },
+      update: { descricao: rotinaDef.descricao },
+      create: { tipoPeleId, descricao: rotinaDef.descricao },
+    });
+    // Itens: apaga e recria (aceitável em seed).
+    await prisma.itemRotina.deleteMany({ where: { rotinaId: rotina.id } });
+    for (const item of rotinaDef.itens) {
+      await prisma.itemRotina.create({
+        data: {
+          rotinaId: rotina.id,
+          etapa: item.etapa,
+          descricao: item.descricao,
+          ordem: item.ordem,
+        },
+      });
+    }
+  }
+}
+
 async function main(): Promise<void> {
   const tiposPeleIds = await seedTiposPele();
   await seedQuestionario(tiposPeleIds);
+  await seedRotinas(tiposPeleIds);
 }
 
 try {
   await main();
-  console.log(`seed concluído: ${tiposPele.length} tipos de pele, ${perguntas.length} perguntas.`);
+  console.log(
+    `seed concluído: ${tiposPele.length} tipos de pele, ${perguntas.length} perguntas, ` +
+      `${rotinas.length} rotinas.`,
+  );
 } catch (err) {
   console.error('falha no seed:', err);
   process.exitCode = 1;
