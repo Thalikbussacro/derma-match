@@ -14,4 +14,8 @@ export const perguntaRepository = {
       include: { opcoes: true },
     });
   },
+
+  contar(): Promise<number> {
+    return prisma.pergunta.count();
+  },
 };

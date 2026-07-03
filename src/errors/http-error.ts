@@ -36,8 +36,9 @@ export class ConflictError extends HttpError {
 export class ValidationError extends HttpError {
   constructor(
     mensagem: string,
+    codigo = 'VALIDACAO',
     public readonly detalhes?: unknown,
   ) {
-    super(400, 'VALIDACAO', mensagem);
+    super(400, codigo, mensagem);
   }
 }

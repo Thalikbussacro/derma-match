@@ -24,4 +24,12 @@ export const respostaUsuarioRepository = {
     const resultado = await prisma.respostaUsuario.deleteMany({ where: { usuarioId } });
     return resultado.count;
   },
+
+  // Refazer o questionário: apaga as respostas e zera o tipo de pele em uma única transação.
+  async refazerQuestionario(usuarioId: number): Promise<void> {
+    await prisma.$transaction([
+      prisma.respostaUsuario.deleteMany({ where: { usuarioId } }),
+      prisma.usuario.update({ where: { id: usuarioId }, data: { tipoPelePredominanteId: null } }),
+    ]);
+  },
 };
