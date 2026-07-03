@@ -12,6 +12,7 @@ import { RedefinirSenhaPage } from './pages/RedefinirSenhaPage';
 import { RotinaPage } from './pages/RotinaPage';
 import { PremiumPage } from './pages/PremiumPage';
 import { ContaPage } from './pages/ContaPage';
+import { ChatPage } from './pages/ChatPage';
 
 export default function App() {
   return (
@@ -68,6 +69,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <PremiumPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              <RequireAuth>
+                <ChatPage />
               </RequireAuth>
             }
           />

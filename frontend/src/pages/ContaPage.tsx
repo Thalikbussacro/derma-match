@@ -15,6 +15,7 @@ import {
   type TrocarSenhaForm,
 } from '../features/conta/conta.schemas';
 import { useAtualizarConta, useExcluirConta, usePerfil } from '../features/conta/useConta';
+import { premiumApi } from '../features/premium/premium.api';
 import { mensagemDeErro } from '../lib/erros';
 
 export function ContaPage() {
@@ -29,6 +30,7 @@ export function ContaPage() {
   const [erroSenha, setErroSenha] = useState<string | null>(null);
   const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
   const [erroExclusao, setErroExclusao] = useState<string | null>(null);
+  const [cancelandoPremium, setCancelandoPremium] = useState(false);
 
   const perfil = perfilQuery.data;
 
@@ -73,6 +75,17 @@ export function ContaPage() {
     }
   }
 
+  async function cancelarPremium() {
+    setCancelandoPremium(true);
+    try {
+      const atualizado = await premiumApi.cancelar();
+      definirUsuario(atualizado);
+      await perfilQuery.refetch();
+    } finally {
+      setCancelandoPremium(false);
+    }
+  }
+
   if (perfilQuery.isLoading) {
     return (
       <div className="flex justify-center py-12 text-brand-500">
@@ -109,6 +122,21 @@ export function ContaPage() {
           </span>
         </div>
       </Card>
+
+      {perfil.plano === 'PREMIUM' && (
+        <Card>
+          <h2 className="font-semibold text-neutral-800">Plano Premium</h2>
+          <p className="mt-1 text-sm text-neutral-600">Seu plano Premium está ativo.</p>
+          <Button
+            variant="secondary"
+            className="mt-3"
+            loading={cancelandoPremium}
+            onClick={() => void cancelarPremium()}
+          >
+            Cancelar Premium
+          </Button>
+        </Card>
+      )}
 
       <Card>
         <h2 className="mb-3 font-semibold text-neutral-800">Editar nome</h2>

@@ -34,6 +34,7 @@ export function HomePage() {
   const { usuario } = useAuth();
   const { data: estado, isLoading } = useEstadoQuestionario();
   const concluido = estado?.estado === 'CONCLUIDO';
+  const ehPremium = usuario?.plano === 'PREMIUM';
 
   return (
     <div className="flex flex-col gap-4">
@@ -51,10 +52,12 @@ export function HomePage() {
             descricao="Os passos de cuidado para a sua pele"
           />
           <AcaoCard
-            to="/premium"
+            to={ehPremium ? '/chat' : '/premium'}
             emoji="💬"
             titulo="Chamar biomédica"
-            descricao="Atendimento personalizado (Premium)"
+            descricao={
+              ehPremium ? 'Converse com sua biomédica' : 'Atendimento personalizado (Premium)'
+            }
           />
           <AcaoCard
             to="/questionario"

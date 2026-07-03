@@ -1,10 +1,36 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Alert } from '../components/ui/Alert';
+import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Spinner } from '../components/ui/Spinner';
+import { useAuth } from '../features/auth/authContext';
+import { premiumApi } from '../features/premium/premium.api';
 import { usePainelUpgrade } from '../features/premium/usePremium';
+import { mensagemDeErro } from '../lib/erros';
 
 export function PremiumPage() {
+  const { usuario, definirUsuario } = useAuth();
+  const navigate = useNavigate();
   const { data, isLoading, isError } = usePainelUpgrade();
+  const [assinando, setAssinando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+
+  const ehPremium = usuario?.plano === 'PREMIUM';
+
+  async function assinar() {
+    setErro(null);
+    setAssinando(true);
+    try {
+      const atualizado = await premiumApi.assinar();
+      definirUsuario(atualizado);
+      void navigate('/chat');
+    } catch (e) {
+      setErro(mensagemDeErro(e, 'Não foi possível assinar.'));
+    } finally {
+      setAssinando(false);
+    }
+  }
 
   if (isLoading) {
     return (
@@ -34,7 +60,26 @@ export function PremiumPage() {
           ))}
         </ul>
       </Card>
-      <Alert tipo="info">{data.aviso}</Alert>
+
+      {ehPremium ? (
+        <>
+          <Alert tipo="sucesso">Você já é Premium! 🎉</Alert>
+          <Link to="/chat">
+            <Button fullWidth>Falar com a biomédica</Button>
+          </Link>
+        </>
+      ) : (
+        <>
+          <Alert tipo="info">{data.aviso}</Alert>
+          {erro && <Alert tipo="erro">{erro}</Alert>}
+          <Button fullWidth loading={assinando} onClick={() => void assinar()}>
+            Assinar Premium
+          </Button>
+          <p className="text-center text-xs text-neutral-400">
+            Simulação — sem cobrança real (projeto acadêmico).
+          </p>
+        </>
+      )}
     </div>
   );
 }

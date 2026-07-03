@@ -3,10 +3,10 @@ import { refreshSessao } from '../features/auth/session';
 import { getAccessToken, setAccessToken } from '../features/auth/tokenStore';
 
 // Cliente HTTP único. withCredentials envia o cookie httpOnly de refresh.
+// Sem Content-Type fixo: o axios define JSON para objetos e multipart para FormData (fotos).
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? '/api',
   withCredentials: true,
-  headers: { 'Content-Type': 'application/json' },
 });
 
 // Injeta o access token (em memória) em cada requisição.
