@@ -2,6 +2,7 @@ import { NotFoundError, ValidationError } from '../errors/http-error.js';
 import { opcaoRespostaRepository } from '../repositories/opcao-resposta.repository.js';
 import { perguntaRepository } from '../repositories/pergunta.repository.js';
 import { respostaUsuarioRepository } from '../repositories/resposta-usuario.repository.js';
+import { tipoPeleRepository } from '../repositories/tipo-pele.repository.js';
 import { usuarioRepository } from '../repositories/usuario.repository.js';
 import type {
   EstadoQuestionarioResponse,
@@ -89,9 +90,54 @@ async function refazer(usuarioId: number): Promise<void> {
   await respostaUsuarioRepository.refazerQuestionario(usuarioId);
 }
 
+// Vencedor: maior soma de pesos. Empate resolvido pelo menor tipoPeleId (RF-QUEST-011).
+export function determinarTipoPeleVencedor(somaPorTipo: Map<number, number>): number | null {
+  let vencedorId: number | null = null;
+  let maiorSoma = -1;
+  for (const [tipoPeleId, soma] of [...somaPorTipo.entries()].sort((a, b) => a[0] - b[0])) {
+    if (soma > maiorSoma) {
+      maiorSoma = soma;
+      vencedorId = tipoPeleId;
+    }
+  }
+  return vencedorId;
+}
+
+async function finalizar(usuarioId: number): Promise<{ tipoPeleId: number; tipoPeleNome: string }> {
+  const proxima = await obterProximaPergunta(usuarioId);
+  if (proxima !== null) {
+    throw new ValidationError('O questionário ainda não foi concluído.', 'QUESTIONARIO_INCOMPLETO');
+  }
+
+  const respostas = await respostaUsuarioRepository.listarPorUsuario(usuarioId);
+  const somaPorTipo = new Map<number, number>();
+  for (const resposta of respostas) {
+    for (const peso of resposta.opcao.pesos) {
+      somaPorTipo.set(peso.tipoPeleId, (somaPorTipo.get(peso.tipoPeleId) ?? 0) + peso.peso);
+    }
+  }
+
+  const vencedorId = determinarTipoPeleVencedor(somaPorTipo);
+  if (vencedorId === null) {
+    throw new ValidationError(
+      'Não há respostas suficientes para calcular o tipo de pele.',
+      'QUESTIONARIO_INCOMPLETO',
+    );
+  }
+
+  const tipoPele = await tipoPeleRepository.buscarPorId(vencedorId);
+  if (!tipoPele) {
+    throw new NotFoundError('Tipo de pele');
+  }
+
+  await usuarioRepository.atualizarTipoPelePredominante(usuarioId, vencedorId);
+  return { tipoPeleId: tipoPele.id, tipoPeleNome: tipoPele.nome };
+}
+
 export const questionarioService = {
   obterEstado,
   obterProximaPergunta,
   responder,
   refazer,
+  finalizar,
 };

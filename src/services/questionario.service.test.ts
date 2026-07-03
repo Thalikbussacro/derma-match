@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { usuarioRepository } from '../repositories/usuario.repository.js';
 import { authService } from './auth.service.js';
-import { questionarioService } from './questionario.service.js';
+import { determinarTipoPeleVencedor, questionarioService } from './questionario.service.js';
 
 async function criarUsuario(): Promise<number> {
   const usuario = await authService.cadastrar({
@@ -96,5 +96,62 @@ describe('questionarioService.refazer', () => {
     expect(estado.perguntasRespondidas).toBe(0);
     expect(estado.tipoPeleId).toBeNull();
     expect(estado.estado).toBe('NAO_INICIADO');
+  });
+});
+
+describe('determinarTipoPeleVencedor', () => {
+  it('escolhe o tipo de maior soma', () => {
+    expect(
+      determinarTipoPeleVencedor(
+        new Map([
+          [1, 5],
+          [2, 3],
+          [4, 8],
+        ]),
+      ),
+    ).toBe(4);
+  });
+
+  it('em empate escolhe o menor tipoPeleId', () => {
+    expect(
+      determinarTipoPeleVencedor(
+        new Map([
+          [3, 10],
+          [2, 10],
+          [5, 4],
+        ]),
+      ),
+    ).toBe(2);
+  });
+
+  it('retorna null para mapa vazio', () => {
+    expect(determinarTipoPeleVencedor(new Map())).toBeNull();
+  });
+});
+
+describe('questionarioService.finalizar', () => {
+  it('rejeita quando o questionário está incompleto', async () => {
+    const id = await criarUsuario();
+    await expect(questionarioService.finalizar(id)).rejects.toThrow('não foi concluído');
+  });
+
+  it('calcula e persiste o tipo de pele (sequência conhecida → oleosa)', async () => {
+    const id = await criarUsuario();
+    // Responde todas as perguntas escolhendo sempre a 1ª opção (sequência que favorece "oleosa").
+    let proxima = await questionarioService.obterProximaPergunta(id);
+    while (proxima !== null) {
+      await questionarioService.responder(id, {
+        perguntaId: proxima.id,
+        opcaoId: proxima.opcoes[0]!.id,
+      });
+      proxima = await questionarioService.obterProximaPergunta(id);
+    }
+
+    const resultado = await questionarioService.finalizar(id);
+    expect(resultado.tipoPeleNome).toBe('oleosa');
+
+    const estado = await questionarioService.obterEstado(id);
+    expect(estado.estado).toBe('CONCLUIDO');
+    expect(estado.tipoPeleId).toBe(resultado.tipoPeleId);
   });
 });
