@@ -35,7 +35,22 @@ model Usuario {
   criadoEm               DateTime @default(now()) @map("criado_em")
   atualizadoEm           DateTime @updatedAt @map("atualizado_em")
 
-  tipoPelePredominante TipoPele? @relation(fields: [tipoPelePredominanteId], references: [id])
+  tipoPelePredominante TipoPele?      @relation(fields: [tipoPelePredominanteId], references: [id])
+  refreshTokens        RefreshToken[]
 
   @@map("usuarios")
+}
+
+model RefreshToken {
+  id         Int       @id @default(autoincrement())
+  usuarioId  Int       @map("usuario_id")
+  tokenHash  String    @unique @map("token_hash") @db.VarChar(255)
+  expiraEm   DateTime  @map("expira_em")
+  revogadoEm DateTime? @map("revogado_em")
+  criadoEm   DateTime  @default(now()) @map("criado_em")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId, revogadoEm])
+  @@map("refresh_tokens")
 }
