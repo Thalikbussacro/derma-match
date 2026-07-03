@@ -70,8 +70,11 @@ no diretório). Nomes: backend = `derma-match`, frontend = `derma-match-frontend
 
 ## Testes
 
-- **Backend:** `pnpm --filter derma-match test:setup` (uma vez) e depois `pnpm test` — usam um schema
-  Postgres isolado. Detalhes em [`backend/SETUP.md`](./backend/SETUP.md).
+- **Backend:** `pnpm --filter derma-match test:setup` (uma vez) e depois
+  `pnpm --filter derma-match test` — usam um schema Postgres isolado. Detalhes em
+  [`backend/SETUP.md`](./backend/SETUP.md).
+- **Frontend:** `pnpm --filter derma-match-frontend test` — Vitest + Testing Library (jsdom).
+- **Todos de uma vez:** `pnpm test` na raiz (requer o banco de teste do backend já preparado).
 - **Manuais de rota:** ficam em `backend/.http/` (não versionada) e usam a extensão **REST Client**
   do VS Code. `fluxo-completo.http` cobre a jornada ponta a ponta.
 
