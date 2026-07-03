@@ -11,6 +11,7 @@ import {
   useResponderBiomedica,
 } from '../../features/biomedica/useBiomedica';
 import { apiBiomedica } from '../../lib/apiBiomedica';
+import { formatarHora } from '../../lib/datas';
 
 export function BiomedicaAtendimentoPage() {
   const { id } = useParams();
@@ -125,6 +126,9 @@ export function BiomedicaAtendimentoPage() {
                     <FotoAnexo anexoId={a.id} instance={apiBiomedica} />
                   </div>
                 ))}
+                <span className="mt-0.5 block text-right text-[10px] opacity-70">
+                  {formatarHora(m.criadoEm)}
+                </span>
               </div>
             </div>
           ))

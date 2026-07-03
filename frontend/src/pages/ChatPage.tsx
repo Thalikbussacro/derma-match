@@ -7,6 +7,7 @@ import { Card } from '../components/ui/Card';
 import { Spinner } from '../components/ui/Spinner';
 import { useAuth } from '../features/auth/authContext';
 import { useConversa, useEnviarMensagem, useMensagens } from '../features/chat/useChat';
+import { formatarHora } from '../lib/datas';
 
 export function ChatPage() {
   const { usuario } = useAuth();
@@ -109,6 +110,9 @@ export function ChatPage() {
                     <FotoAnexo anexoId={a.id} />
                   </div>
                 ))}
+                <span className="mt-0.5 block text-right text-[10px] opacity-70">
+                  {formatarHora(m.criadoEm)}
+                </span>
               </div>
             </div>
           ))

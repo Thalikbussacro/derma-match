@@ -1,9 +1,20 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useBiomedicaAuth } from '../../features/biomedica/biomedicaAuthContext';
 
 export function BiomedicaLayout() {
   const { biomedica, logout } = useBiomedicaAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const nome = location.pathname.includes('/atendimento')
+      ? 'Atendimento'
+      : location.pathname.endsWith('/login')
+        ? 'Entrar'
+        : 'Conversas';
+    document.title = `${nome} · Biomédica · Derma Match`;
+  }, [location.pathname]);
 
   async function sair() {
     await logout();

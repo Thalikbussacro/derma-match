@@ -11,6 +11,7 @@ const TITULOS: Record<string, string> = {
   '/questionario': 'Questionário',
   '/rotina': 'Minha rotina',
   '/premium': 'Premium',
+  '/chat': 'Atendimento',
   '/conta': 'Minha conta',
 };
 

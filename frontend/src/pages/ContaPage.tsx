@@ -31,6 +31,8 @@ export function ContaPage() {
   const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
   const [erroExclusao, setErroExclusao] = useState<string | null>(null);
   const [cancelandoPremium, setCancelandoPremium] = useState(false);
+  const [confirmandoCancel, setConfirmandoCancel] = useState(false);
+  const [erroCancel, setErroCancel] = useState<string | null>(null);
 
   const perfil = perfilQuery.data;
 
@@ -76,11 +78,15 @@ export function ContaPage() {
   }
 
   async function cancelarPremium() {
+    setErroCancel(null);
     setCancelandoPremium(true);
     try {
       const atualizado = await premiumApi.cancelar();
       definirUsuario(atualizado);
       await perfilQuery.refetch();
+      setConfirmandoCancel(false);
+    } catch (erro) {
+      setErroCancel(mensagemDeErro(erro, 'Não foi possível cancelar o Premium.'));
     } finally {
       setCancelandoPremium(false);
     }
@@ -127,14 +133,35 @@ export function ContaPage() {
         <Card>
           <h2 className="font-semibold text-neutral-800">Plano Premium</h2>
           <p className="mt-1 text-sm text-neutral-600">Seu plano Premium está ativo.</p>
-          <Button
-            variant="secondary"
-            className="mt-3"
-            loading={cancelandoPremium}
-            onClick={() => void cancelarPremium()}
-          >
-            Cancelar Premium
-          </Button>
+          {erroCancel && (
+            <div className="mt-3">
+              <Alert tipo="erro">{erroCancel}</Alert>
+            </div>
+          )}
+          {confirmandoCancel ? (
+            <div className="mt-3 flex flex-col gap-2">
+              <p className="text-sm font-medium text-neutral-800">
+                Cancelar o Premium? Você perde o acesso ao chat com a biomédica.
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="danger"
+                  fullWidth
+                  loading={cancelandoPremium}
+                  onClick={() => void cancelarPremium()}
+                >
+                  Sim, cancelar
+                </Button>
+                <Button variant="secondary" fullWidth onClick={() => setConfirmandoCancel(false)}>
+                  Manter
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button variant="secondary" className="mt-3" onClick={() => setConfirmandoCancel(true)}>
+              Cancelar Premium
+            </Button>
+          )}
         </Card>
       )}
 
