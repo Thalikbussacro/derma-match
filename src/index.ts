@@ -1,4 +1,5 @@
 import 'dotenv/config';
 import { env } from './config/env.js';
+import { logger } from './lib/logger.js';
 
-console.log(`config carregada: NODE_ENV=${env.NODE_ENV}, PORT=${env.PORT} (${typeof env.PORT})`);
+logger.info({ ambiente: env.NODE_ENV, porta: env.PORT }, 'configuração carregada');
