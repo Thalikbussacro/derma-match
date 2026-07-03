@@ -12,7 +12,7 @@ Monorepo **pnpm** com três pacotes:
 
 **Stack:** Node 22 · TypeScript strict · Express 5 · Prisma 6 / PostgreSQL 16 · Zod · JWT + bcrypt · Vitest · React 19 · Tailwind CSS.
 
-**Estado:** MVP concluído — backend (Fases 0–4) e frontend (Fases F0–F4). Plano Premium adiado (Fase 5).
+**Estado:** MVP + Premium concluídos — backend (Fases 0–4), frontend (Fases F0–F4) e Premium (chat com biomédica, fotos e assinatura mock — Fases P1–P8).
 
 ## Pré-requisitos
 
@@ -53,6 +53,17 @@ Para popular o banco novamente sem recriar (o seed é idempotente):
 pnpm --filter derma-match exec prisma db seed
 ```
 
+## Plano Premium
+
+A experiência Premium está implementada — assinatura **mockada** (sem cobrança real; a integração de pagamento fica para produção):
+
+- **Usuária Premium** conversa com uma biomédica (chat com polling), anexa fotos (retenção LGPD de 90 dias) e vê o histórico. Assina/cancela pelo painel Premium e pela conta.
+- **Biomédica** tem área própria em `/biomedica` (login separado): lista de conversas, atendimento e contexto clínico (respostas do questionário + tipo de pele).
+
+Biomédica de exemplo (do seed): **`biomedica@dermamatch.com`** / **`biomedica123`**.
+
+Limpeza (agendar via cron em produção): `pnpm --filter derma-match cleanup:tokens` (refresh tokens) e `cleanup:anexos` (fotos vencidas).
+
 ## Scripts (raiz do workspace)
 
 | Script              | O que faz                                        |
@@ -62,7 +73,7 @@ pnpm --filter derma-match exec prisma db seed
 | `pnpm build`        | Builda todos os pacotes (shared → backend/front).|
 | `pnpm typecheck`    | Checagem de tipos em todos os pacotes.           |
 | `pnpm lint`         | ESLint em todos os pacotes.                       |
-| `pnpm test`         | Roda a suíte de testes do backend (Vitest).      |
+| `pnpm test`         | Roda os testes de backend e frontend (Vitest).   |
 
 Cada pacote também tem seus próprios scripts — rode com `pnpm --filter <nome> <script>` (ou entrando
 no diretório). Nomes: backend = `derma-match`, frontend = `derma-match-frontend`, shared =
