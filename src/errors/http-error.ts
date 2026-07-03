@@ -16,8 +16,8 @@ export class NotFoundError extends HttpError {
 }
 
 export class UnauthorizedError extends HttpError {
-  constructor(mensagem = 'Não autenticado.') {
-    super(401, 'NAO_AUTENTICADO', mensagem);
+  constructor(mensagem = 'Não autenticado.', codigo = 'NAO_AUTENTICADO') {
+    super(401, codigo, mensagem);
   }
 }
 
