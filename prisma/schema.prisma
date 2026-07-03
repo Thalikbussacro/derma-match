@@ -84,7 +84,8 @@ model Pergunta {
   dependeDeOpcao OpcaoResposta?    @relation("OpcaoDependencia", fields: [dependeDeOpcaoId], references: [id])
   respostas      RespostaUsuario[]
 
-  @@index([ordem])
+  // Unique (não só index): a navegação apresenta por `ordem`, que precisa ser distinta.
+  @@unique([ordem])
   @@map("perguntas")
 }
 

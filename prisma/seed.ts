@@ -167,7 +167,10 @@ async function seedQuestionario(tiposPeleIds: Map<TipoNome, number>): Promise<vo
 
   const opcaoIdPorChave = new Map<string, number>();
 
-  for (const perguntaDef of perguntas) {
+  // Processa por `ordem` (não por posição no array): garante que uma dependência só resolve para
+  // uma opção de pergunta com `ordem` menor — mesmo contrato usado na navegação.
+  const perguntasOrdenadas = [...perguntas].sort((a, b) => a.ordem - b.ordem);
+  for (const perguntaDef of perguntasOrdenadas) {
     let dependeDeOpcaoId: number | null = null;
     if (perguntaDef.dependeDe !== undefined) {
       const id = opcaoIdPorChave.get(perguntaDef.dependeDe);

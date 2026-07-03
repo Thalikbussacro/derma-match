@@ -8,13 +8,6 @@ export const perguntaRepository = {
     });
   },
 
-  buscarPorId(id: number) {
-    return prisma.pergunta.findUnique({
-      where: { id },
-      include: { opcoes: true },
-    });
-  },
-
   contar(): Promise<number> {
     return prisma.pergunta.count();
   },
