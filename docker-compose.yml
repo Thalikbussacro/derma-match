@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: derma-match-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-derma}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-derma}
+      POSTGRES_DB: ${POSTGRES_DB:-derma_match}
+    ports:
+      # Porta de host configurável para evitar conflito com outro Postgres local.
+      - '${POSTGRES_HOST_PORT:-5433}:5432'
+    volumes:
+      - derma_match_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-derma} -d ${POSTGRES_DB:-derma_match}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  derma_match_pgdata:
