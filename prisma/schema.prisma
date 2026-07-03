@@ -8,3 +8,11 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model TipoPele {
+  id        Int    @id @default(autoincrement())
+  nome      String @unique @db.VarChar(40)
+  descricao String
+
+  @@map("tipos_pele")
+}
