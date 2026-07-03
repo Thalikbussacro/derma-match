@@ -12,6 +12,7 @@ const accessPayloadSchema = z.object({
 const refreshPayloadSchema = z.object({
   sub: z.coerce.number().int(),
   jti: z.string().min(1),
+  exp: z.number().int(),
 });
 
 export type AccessTokenPayload = z.infer<typeof accessPayloadSchema>;
