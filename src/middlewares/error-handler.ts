@@ -4,7 +4,12 @@ import { Prisma } from '@prisma/client';
 import { HttpError, ValidationError } from '../errors/http-error.js';
 import { logger } from '../lib/logger.js';
 
-export function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFunction): void {
+export function errorHandler(
+  err: unknown,
+  _req: Request,
+  res: Response,
+  _next: NextFunction,
+): void {
   if (err instanceof HttpError) {
     const corpo: { codigo: string; mensagem: string; detalhes?: unknown } = {
       codigo: err.codigo,
