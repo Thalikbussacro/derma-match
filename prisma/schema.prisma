@@ -37,8 +37,9 @@ model Usuario {
   tentativasLoginFalhas  Int       @default(0) @map("tentativas_login_falhas")
   bloqueadoAte           DateTime? @map("bloqueado_ate")
 
-  tipoPelePredominante TipoPele?      @relation(fields: [tipoPelePredominanteId], references: [id])
-  refreshTokens        RefreshToken[]
+  tipoPelePredominante   TipoPele?               @relation(fields: [tipoPelePredominanteId], references: [id])
+  refreshTokens          RefreshToken[]
+  tokensRecuperacaoSenha TokenRecuperacaoSenha[]
 
   @@map("usuarios")
 }
@@ -55,4 +56,18 @@ model RefreshToken {
 
   @@index([usuarioId, revogadoEm])
   @@map("refresh_tokens")
+}
+
+model TokenRecuperacaoSenha {
+  id        Int       @id @default(autoincrement())
+  usuarioId Int       @map("usuario_id")
+  tokenHash String    @unique @map("token_hash") @db.VarChar(255)
+  expiraEm  DateTime  @map("expira_em")
+  usadoEm   DateTime? @map("usado_em")
+  criadoEm  DateTime  @default(now()) @map("criado_em")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId, usadoEm])
+  @@map("tokens_recuperacao_senha")
 }
