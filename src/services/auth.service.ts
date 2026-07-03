@@ -13,6 +13,7 @@ export interface LoginResultado {
   usuario: UsuarioResponse;
   accessToken: string;
   refreshToken: string;
+  refreshTokenExpiraEm: Date;
 }
 
 function paraResponse(usuario: Usuario): UsuarioResponse {
@@ -64,12 +65,18 @@ export const authService = {
     const payloadRefresh = tokenService.verificarRefreshToken(refreshToken);
 
     // Guarda só o hash do jti; o token cru nunca toca o banco.
+    const expiraEm = new Date(payloadRefresh.exp * 1000);
     await refreshTokenRepository.criar({
       usuarioId: usuario.id,
       tokenHash: hashSha256(payloadRefresh.jti),
-      expiraEm: new Date(payloadRefresh.exp * 1000),
+      expiraEm,
     });
 
-    return { usuario: paraResponse(usuario), accessToken, refreshToken };
+    return {
+      usuario: paraResponse(usuario),
+      accessToken,
+      refreshToken,
+      refreshTokenExpiraEm: expiraEm,
+    };
   },
 };
