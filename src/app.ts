@@ -3,6 +3,8 @@ import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { env } from './config/env.js';
+import { notFound } from './middlewares/not-found.js';
+import { errorHandler } from './middlewares/error-handler.js';
 
 export const app = express();
 
@@ -22,3 +24,8 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+
+// As rotas de domínio são registradas aqui (ver src/routes) antes do notFound.
+
+app.use(notFound);
+app.use(errorHandler);
