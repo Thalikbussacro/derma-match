@@ -22,8 +22,8 @@ export class UnauthorizedError extends HttpError {
 }
 
 export class ForbiddenError extends HttpError {
-  constructor(mensagem = 'Operação não permitida.') {
-    super(403, 'PROIBIDO', mensagem);
+  constructor(mensagem = 'Operação não permitida.', codigo = 'PROIBIDO') {
+    super(403, codigo, mensagem);
   }
 }
 
