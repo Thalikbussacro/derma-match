@@ -10,7 +10,7 @@ const PAINEL_UPGRADE: PainelUpgradeResponse = {
     'Envio de fotos para análise da sua pele',
     'Histórico de conversas sempre à mão',
   ],
-  aviso: 'Em breve. Fique de olho nas novidades.',
+  aviso: 'Em breve! Fique de olho — logo você poderá assinar o Premium e falar com uma biomédica.',
 };
 
 function obterPainelUpgrade(): PainelUpgradeResponse {
