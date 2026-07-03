@@ -18,6 +18,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:setup": "tsx tests/setup-db.ts",
+    "cleanup:tokens": "tsx src/scripts/limpar-refresh-tokens.ts",
     "postinstall": "prisma generate"
   },
   "devDependencies": {
