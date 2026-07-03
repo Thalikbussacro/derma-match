@@ -7,6 +7,7 @@ import { env } from './config/env.js';
 import { logger } from './lib/logger.js';
 import { notFound } from './middlewares/not-found.js';
 import { errorHandler } from './middlewares/error-handler.js';
+import { router } from './routes/index.js';
 
 export const app = express();
 
@@ -37,7 +38,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// As rotas de domínio são registradas aqui (ver src/routes) antes do notFound.
+app.use('/api', router);
 
 app.use(notFound);
 app.use(errorHandler);
