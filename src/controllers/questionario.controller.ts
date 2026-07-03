@@ -1,14 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
-import { UnauthorizedError } from '../errors/http-error.js';
+import { usuarioIdAutenticado } from '../lib/usuario-autenticado.js';
 import { responderPerguntaSchema } from '../schemas/questionario.schema.js';
 import { questionarioService } from '../services/questionario.service.js';
-
-function usuarioIdAutenticado(req: Request): number {
-  if (!req.usuario) {
-    throw new UnauthorizedError();
-  }
-  return req.usuario.id;
-}
 
 export const questionarioController = {
   obterEstado: async (req: Request, res: Response, next: NextFunction): Promise<void> => {

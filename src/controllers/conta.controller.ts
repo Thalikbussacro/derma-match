@@ -1,14 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
-import { UnauthorizedError } from '../errors/http-error.js';
+import { usuarioIdAutenticado } from '../lib/usuario-autenticado.js';
 import { atualizarContaSchema } from '../schemas/conta.schema.js';
 import { contaService } from '../services/conta.service.js';
-
-function usuarioIdAutenticado(req: Request): number {
-  if (!req.usuario) {
-    throw new UnauthorizedError();
-  }
-  return req.usuario.id;
-}
 
 export const contaController = {
   buscarPerfil: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
