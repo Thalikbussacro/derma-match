@@ -41,8 +41,8 @@ function hashSha256(valor: string): string {
 
 // Gera o par de tokens e persiste só o hash do jti do refresh. Nunca grava o token cru.
 async function emitirTokens(usuario: Usuario): Promise<LoginResultado> {
-  const accessToken = tokenService.gerarAccessToken(usuario.id, usuario.plano);
-  const refreshToken = tokenService.gerarRefreshToken(usuario.id);
+  const accessToken = tokenService.gerarAccessToken(usuario.id, 'USUARIA', usuario.plano);
+  const refreshToken = tokenService.gerarRefreshToken(usuario.id, 'USUARIA');
   const payload = tokenService.verificarRefreshToken(refreshToken);
   const expiraEm = new Date(payload.exp * 1000);
 

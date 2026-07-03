@@ -20,13 +20,13 @@ describe('authenticate', () => {
   });
 
   it('popula req.usuario com token válido e chama next', () => {
-    const token = tokenService.gerarAccessToken(99, 'FREE');
+    const token = tokenService.gerarAccessToken(99, 'USUARIA', 'FREE');
     const req = reqComHeader(`Bearer ${token}`);
     const next = vi.fn();
 
     authenticate(req, res, next as NextFunction);
 
-    expect(req.usuario).toEqual({ id: 99, plano: 'FREE' });
+    expect(req.usuario).toEqual({ id: 99, tipoUsuario: 'USUARIA', plano: 'FREE' });
     expect(next).toHaveBeenCalledOnce();
   });
 

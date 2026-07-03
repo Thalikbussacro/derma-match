@@ -22,6 +22,6 @@ export function authenticate(req: Request, _res: Response, next: NextFunction): 
     throw new UnauthorizedError('Token de acesso inválido.', 'TOKEN_INVALIDO');
   }
 
-  req.usuario = { id: payload.sub, plano: payload.plano };
+  req.usuario = { id: payload.sub, tipoUsuario: payload.tipoUsuario, plano: payload.plano };
   next();
 }

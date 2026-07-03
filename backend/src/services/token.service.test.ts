@@ -5,16 +5,18 @@ import { tokenService } from './token.service.js';
 
 describe('tokenService', () => {
   it('gera e verifica um access token', () => {
-    const token = tokenService.gerarAccessToken(42, 'FREE');
+    const token = tokenService.gerarAccessToken(42, 'USUARIA', 'FREE');
     const payload = tokenService.verificarAccessToken(token);
     expect(payload.sub).toBe(42);
+    expect(payload.tipoUsuario).toBe('USUARIA');
     expect(payload.plano).toBe('FREE');
   });
 
   it('gera um refresh token com jti e o verifica', () => {
-    const token = tokenService.gerarRefreshToken(7);
+    const token = tokenService.gerarRefreshToken(7, 'USUARIA');
     const payload = tokenService.verificarRefreshToken(token);
     expect(payload.sub).toBe(7);
+    expect(payload.tipoUsuario).toBe('USUARIA');
     expect(payload.jti.length).toBeGreaterThan(0);
   });
 
