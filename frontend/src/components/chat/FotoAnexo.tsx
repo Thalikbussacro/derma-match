@@ -1,14 +1,22 @@
 import { useEffect, useState } from 'react';
+import type { AxiosInstance } from 'axios';
 import { api } from '../../lib/api';
 
 // A imagem vem de um endpoint autenticado, então buscamos o blob com o token e criamos um object URL.
-export function FotoAnexo({ anexoId }: { anexoId: number }) {
+// `instance` permite usar o cliente da usuária (padrão) ou o da biomédica.
+export function FotoAnexo({
+  anexoId,
+  instance = api,
+}: {
+  anexoId: number;
+  instance?: AxiosInstance;
+}) {
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
     let ativo = true;
     let objectUrl: string | null = null;
-    void api
+    void instance
       .get<Blob>(`/anexos/${anexoId}`, { responseType: 'blob' })
       .then((res) => {
         objectUrl = URL.createObjectURL(res.data);
@@ -23,7 +31,7 @@ export function FotoAnexo({ anexoId }: { anexoId: number }) {
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [anexoId]);
+  }, [anexoId, instance]);
 
   if (!url) {
     return <div className="h-32 w-32 animate-pulse rounded-lg bg-neutral-200" />;

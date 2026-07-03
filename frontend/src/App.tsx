@@ -13,6 +13,12 @@ import { RotinaPage } from './pages/RotinaPage';
 import { PremiumPage } from './pages/PremiumPage';
 import { ContaPage } from './pages/ContaPage';
 import { ChatPage } from './pages/ChatPage';
+import { BiomedicaLayout } from './components/biomedica/BiomedicaLayout';
+import { RequireBiomedica } from './components/biomedica/RequireBiomedica';
+import { BiomedicaAuthProvider } from './features/biomedica/BiomedicaAuthProvider';
+import { BiomedicaAtendimentoPage } from './pages/biomedica/BiomedicaAtendimentoPage';
+import { BiomedicaDashboardPage } from './pages/biomedica/BiomedicaDashboardPage';
+import { BiomedicaLoginPage } from './pages/biomedica/BiomedicaLoginPage';
 
 export default function App() {
   return (
@@ -90,6 +96,34 @@ export default function App() {
           />
 
           <Route path="*" element={<NotFound />} />
+        </Route>
+
+        {/* Área da biomédica: layout e autenticação próprios (ADR-0012). */}
+        <Route
+          path="/biomedica"
+          element={
+            <BiomedicaAuthProvider>
+              <BiomedicaLayout />
+            </BiomedicaAuthProvider>
+          }
+        >
+          <Route path="login" element={<BiomedicaLoginPage />} />
+          <Route
+            index
+            element={
+              <RequireBiomedica>
+                <BiomedicaDashboardPage />
+              </RequireBiomedica>
+            }
+          />
+          <Route
+            path="atendimento/:id"
+            element={
+              <RequireBiomedica>
+                <BiomedicaAtendimentoPage />
+              </RequireBiomedica>
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>
