@@ -21,6 +21,7 @@ model TipoPele {
 
   usuariosPredominantes Usuario[]
   pesos                 PesoOpcaoPele[]
+  rotina                Rotina?
 
   @@map("tipos_pele")
 }
@@ -128,4 +129,36 @@ model RespostaUsuario {
   @@unique([usuarioId, perguntaId])
   @@index([usuarioId])
   @@map("respostas_usuario")
+}
+
+enum EtapaRotina {
+  LIMPEZA
+  TONIFICACAO
+  HIDRATACAO
+  PROTECAO_SOLAR
+  TRATAMENTO
+}
+
+model Rotina {
+  id         Int    @id @default(autoincrement())
+  tipoPeleId Int    @unique @map("tipo_pele_id")
+  descricao  String
+
+  tipoPele TipoPele     @relation(fields: [tipoPeleId], references: [id])
+  itens    ItemRotina[]
+
+  @@map("rotinas")
+}
+
+model ItemRotina {
+  id        Int         @id @default(autoincrement())
+  rotinaId  Int         @map("rotina_id")
+  etapa     EtapaRotina
+  descricao String
+  ordem     Int
+
+  rotina Rotina @relation(fields: [rotinaId], references: [id], onDelete: Cascade)
+
+  @@index([rotinaId, ordem])
+  @@map("itens_rotina")
 }
