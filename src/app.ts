@@ -2,12 +2,24 @@ import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import { pinoHttp } from 'pino-http';
 import { env } from './config/env.js';
+import { logger } from './lib/logger.js';
 import { notFound } from './middlewares/not-found.js';
 import { errorHandler } from './middlewares/error-handler.js';
 
 export const app = express();
 
+app.use(
+  pinoHttp({
+    logger,
+    customLogLevel: (_req, res, err) => {
+      if (res.statusCode >= 500 || err) return 'error';
+      if (res.statusCode >= 400) return 'warn';
+      return 'info';
+    },
+  }),
+);
 app.use(helmet());
 app.use(
   cors({
