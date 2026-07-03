@@ -16,3 +16,11 @@ export function mensagemDeErro(
   }
   return padrao;
 }
+
+// Extrai o código de erro do backend (ex.: QUESTIONARIO_INCOMPLETO).
+export function codigoDeErro(erro: unknown): string | undefined {
+  if (erro instanceof AxiosError) {
+    return (erro.response?.data as { codigo?: string } | undefined)?.codigo;
+  }
+  return undefined;
+}

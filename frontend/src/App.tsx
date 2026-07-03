@@ -9,6 +9,9 @@ import { NotFound } from './pages/NotFound';
 import { QuestionarioPage } from './pages/QuestionarioPage';
 import { RecuperarSenhaPage } from './pages/RecuperarSenhaPage';
 import { RedefinirSenhaPage } from './pages/RedefinirSenhaPage';
+import { RotinaPage } from './pages/RotinaPage';
+import { PremiumPage } from './pages/PremiumPage';
+import { ContaPage } from './pages/ContaPage';
 
 export default function App() {
   return (
@@ -49,6 +52,30 @@ export default function App() {
             element={
               <RequireAuth>
                 <QuestionarioPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/rotina"
+            element={
+              <RequireAuth>
+                <RotinaPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/premium"
+            element={
+              <RequireAuth>
+                <PremiumPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/conta"
+            element={
+              <RequireAuth>
+                <ContaPage />
               </RequireAuth>
             }
           />
