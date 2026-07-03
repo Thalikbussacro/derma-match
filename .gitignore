@@ -141,3 +141,10 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+.claude
+
+# Arquivos .http de teste (REST Client do VS Code)
+.http/
+
+docs/adr
