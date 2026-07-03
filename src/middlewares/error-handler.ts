@@ -42,9 +42,30 @@ export function errorHandler(
     return;
   }
 
+  // Erros do framework (ex.: body-parser em JSON malformado, payload grande) carregam status
+  // HTTP próprio. Honrar erros de cliente (4xx) para não mascará-los como falha do servidor.
+  const statusCliente = statusHttpDeCliente(err);
+  if (statusCliente !== undefined) {
+    res.status(statusCliente).json({
+      codigo: 'REQUISICAO_INVALIDA',
+      mensagem: 'Requisição inválida.',
+    });
+    return;
+  }
+
   logger.error({ err }, 'erro não tratado');
   res.status(500).json({
     codigo: 'ERRO_INTERNO',
     mensagem: 'Erro interno.',
   });
+}
+
+function statusHttpDeCliente(err: unknown): number | undefined {
+  if (typeof err !== 'object' || err === null) return undefined;
+  const e = err as { status?: unknown; statusCode?: unknown };
+  const candidato = typeof e.status === 'number' ? e.status : e.statusCode;
+  if (typeof candidato === 'number' && candidato >= 400 && candidato < 500) {
+    return candidato;
+  }
+  return undefined;
 }

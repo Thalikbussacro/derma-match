@@ -8,6 +8,7 @@ import { logger } from './lib/logger.js';
 import { notFound } from './middlewares/not-found.js';
 import { errorHandler } from './middlewares/error-handler.js';
 import { router } from './routes/index.js';
+import { ForbiddenError } from './errors/http-error.js';
 
 export const app = express();
 
@@ -29,7 +30,7 @@ app.use(
       if (!origin || env.CORS_ORIGIN.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('Origem não permitida pelo CORS.'));
+        callback(new ForbiddenError('Origem não permitida pelo CORS.'));
       }
     },
     credentials: true,
