@@ -8,6 +8,8 @@ import type { CadastroInput, LoginInput, UsuarioResponse } from '../schemas/auth
 import { tokenService } from './token.service.js';
 
 const CUSTO_BCRYPT = 10;
+const MAX_TENTATIVAS_LOGIN = 5;
+const BLOQUEIO_LOGIN_MS = 15 * 60 * 1000;
 
 export interface LoginResultado {
   usuario: UsuarioResponse;
@@ -76,11 +78,24 @@ export const authService = {
       throw new UnauthorizedError('Credenciais inválidas.');
     }
 
+    if (usuario.bloqueadoAte && usuario.bloqueadoAte.getTime() > Date.now()) {
+      throw new UnauthorizedError(
+        'Conta temporariamente bloqueada por tentativas de login. Tente novamente mais tarde.',
+        'CONTA_BLOQUEADA',
+      );
+    }
+
     const senhaConfere = await bcrypt.compare(input.senha, usuario.senhaHash);
     if (!senhaConfere) {
+      const atualizado = await usuarioRepository.incrementarTentativasFalhas(usuario.id);
+      if (atualizado.tentativasLoginFalhas >= MAX_TENTATIVAS_LOGIN) {
+        await usuarioRepository.bloquear(usuario.id, new Date(Date.now() + BLOQUEIO_LOGIN_MS));
+      }
       throw new UnauthorizedError('Credenciais inválidas.');
     }
 
+    // Sucesso: zera contador e desbloqueia.
+    await usuarioRepository.limparTentativas(usuario.id);
     return emitirTokens(usuario);
   },
 

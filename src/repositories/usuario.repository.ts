@@ -33,4 +33,25 @@ export const usuarioRepository = {
       data: { tipoPelePredominanteId },
     });
   },
+
+  incrementarTentativasFalhas(id: number): Promise<Usuario> {
+    return prisma.usuario.update({
+      where: { id },
+      data: { tentativasLoginFalhas: { increment: 1 } },
+    });
+  },
+
+  bloquear(id: number, bloqueadoAte: Date): Promise<Usuario> {
+    return prisma.usuario.update({
+      where: { id },
+      data: { bloqueadoAte, tentativasLoginFalhas: 0 },
+    });
+  },
+
+  limparTentativas(id: number): Promise<Usuario> {
+    return prisma.usuario.update({
+      where: { id },
+      data: { tentativasLoginFalhas: 0, bloqueadoAte: null },
+    });
+  },
 };

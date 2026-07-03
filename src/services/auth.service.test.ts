@@ -96,3 +96,40 @@ describe('authService.logout', () => {
     await expect(authService.logout(login.refreshToken)).resolves.toBeUndefined();
   });
 });
+
+describe('authService.login — bloqueio por tentativas', () => {
+  it('bloqueia a conta após 5 tentativas falhas seguidas', async () => {
+    await authService.cadastrar(inputValido);
+
+    for (let i = 0; i < 5; i++) {
+      await expect(
+        authService.login({ email: inputValido.email, senha: 'errada123' }),
+      ).rejects.toThrow('Credenciais inválidas.');
+    }
+
+    // mesmo com a senha correta, a conta está bloqueada
+    await expect(
+      authService.login({ email: inputValido.email, senha: inputValido.senha }),
+    ).rejects.toThrow('bloqueada');
+  });
+
+  it('permite login após o bloqueio expirar', async () => {
+    await authService.cadastrar(inputValido);
+    for (let i = 0; i < 5; i++) {
+      await expect(
+        authService.login({ email: inputValido.email, senha: 'errada123' }),
+      ).rejects.toThrow();
+    }
+
+    const usuario = await usuarioRepository.buscarPorEmail(inputValido.email);
+    if (!usuario) throw new Error('usuário de teste não encontrado');
+    // simula o bloqueio já expirado (bloqueadoAte no passado, contador zerado)
+    await usuarioRepository.bloquear(usuario.id, new Date(Date.now() - 1000));
+
+    const resultado = await authService.login({
+      email: inputValido.email,
+      senha: inputValido.senha,
+    });
+    expect(resultado.accessToken.length).toBeGreaterThan(0);
+  });
+});

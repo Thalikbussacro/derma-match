@@ -32,8 +32,10 @@ model Usuario {
   plano                  Plano    @default(FREE)
   tipoPelePredominanteId Int?     @map("tipo_pele_predominante_id")
   consentimentoLgpdEm    DateTime @map("consentimento_lgpd_em")
-  criadoEm               DateTime @default(now()) @map("criado_em")
-  atualizadoEm           DateTime @updatedAt @map("atualizado_em")
+  criadoEm               DateTime  @default(now()) @map("criado_em")
+  atualizadoEm           DateTime  @updatedAt @map("atualizado_em")
+  tentativasLoginFalhas  Int       @default(0) @map("tentativas_login_falhas")
+  bloqueadoAte           DateTime? @map("bloqueado_ate")
 
   tipoPelePredominante TipoPele?      @relation(fields: [tipoPelePredominanteId], references: [id])
   refreshTokens        RefreshToken[]
