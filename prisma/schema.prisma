@@ -9,10 +9,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Plano {
+  FREE
+  PREMIUM
+}
+
 model TipoPele {
   id        Int    @id @default(autoincrement())
   nome      String @unique @db.VarChar(40)
   descricao String
 
+  usuariosPredominantes Usuario[]
+
   @@map("tipos_pele")
+}
+
+model Usuario {
+  id                     Int      @id @default(autoincrement())
+  nome                   String   @db.VarChar(120)
+  email                  String   @unique @db.VarChar(160)
+  senhaHash              String   @map("senha_hash") @db.VarChar(255)
+  plano                  Plano    @default(FREE)
+  tipoPelePredominanteId Int?     @map("tipo_pele_predominante_id")
+  consentimentoLgpdEm    DateTime @map("consentimento_lgpd_em")
+  criadoEm               DateTime @default(now()) @map("criado_em")
+  atualizadoEm           DateTime @updatedAt @map("atualizado_em")
+
+  tipoPelePredominante TipoPele? @relation(fields: [tipoPelePredominanteId], references: [id])
+
+  @@map("usuarios")
 }
