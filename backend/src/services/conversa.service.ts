@@ -19,7 +19,7 @@ function conversaResponse(conversa: Conversa, biomedicaNome: string): ConversaRe
   };
 }
 
-function mensagemResponse(m: MensagemComAnexos): MensagemResponse {
+export function mensagemResponse(m: MensagemComAnexos): MensagemResponse {
   return {
     id: m.id,
     autorTipo: m.autorTipo,

@@ -25,6 +25,24 @@ export const conversaResponseSchema = z.object({
 });
 export type ConversaResponse = z.infer<typeof conversaResponseSchema>;
 
+// --- Área da biomédica ---
+
+export const conversaBiomedicaResponseSchema = z.object({
+  id: z.number(),
+  usuarioNome: z.string(),
+  ultimaMensagem: z.string(),
+  ultimaAtividade: z.string(),
+  naoRespondida: z.boolean(),
+});
+export type ConversaBiomedicaResponse = z.infer<typeof conversaBiomedicaResponseSchema>;
+
+export const contextoClinicoResponseSchema = z.object({
+  usuarioNome: z.string(),
+  tipoPeleNome: z.string().nullable(),
+  respostas: z.array(z.object({ pergunta: z.string(), resposta: z.string() })),
+});
+export type ContextoClinicoResponse = z.infer<typeof contextoClinicoResponseSchema>;
+
 // --- Request ---
 
 export const enviarMensagemSchema = z

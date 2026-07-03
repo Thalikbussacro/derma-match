@@ -17,4 +17,20 @@ export const conversaRepository = {
   atualizarUltimaAtividade(id: number): Promise<Conversa> {
     return prisma.conversa.update({ where: { id }, data: { ultimaAtividade: new Date() } });
   },
+
+  // Conversas de uma biomédica, com o nome da usuária e a última mensagem (para a listagem).
+  listarDaBiomedica(biomedicaId: number) {
+    return prisma.conversa.findMany({
+      where: { biomedicaId },
+      orderBy: { ultimaAtividade: 'desc' },
+      include: {
+        usuario: { select: { nome: true } },
+        mensagens: { orderBy: { criadoEm: 'desc' }, take: 1 },
+      },
+    });
+  },
+
+  buscarDaBiomedica(conversaId: number, biomedicaId: number): Promise<Conversa | null> {
+    return prisma.conversa.findFirst({ where: { id: conversaId, biomedicaId } });
+  },
 };

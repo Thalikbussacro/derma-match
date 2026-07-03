@@ -12,6 +12,15 @@ export const respostaUsuarioRepository = {
     return prisma.respostaUsuario.count({ where: { usuarioId } });
   },
 
+  // Respostas com o texto da pergunta e da opção, para o contexto clínico da biomédica.
+  listarComContexto(usuarioId: number) {
+    return prisma.respostaUsuario.findMany({
+      where: { usuarioId },
+      include: { pergunta: true, opcao: true },
+      orderBy: { pergunta: { ordem: 'asc' } },
+    });
+  },
+
   upsert(usuarioId: number, perguntaId: number, opcaoId: number) {
     return prisma.respostaUsuario.upsert({
       where: { usuarioId_perguntaId: { usuarioId, perguntaId } },
