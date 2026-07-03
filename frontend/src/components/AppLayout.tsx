@@ -1,9 +1,28 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/authContext';
+
+const TITULOS: Record<string, string> = {
+  '/': 'Início',
+  '/login': 'Entrar',
+  '/cadastro': 'Criar conta',
+  '/recuperar-senha': 'Recuperar senha',
+  '/redefinir-senha': 'Nova senha',
+  '/questionario': 'Questionário',
+  '/rotina': 'Minha rotina',
+  '/premium': 'Premium',
+  '/conta': 'Minha conta',
+};
 
 export function AppLayout() {
   const { usuario, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const nome = TITULOS[location.pathname];
+    document.title = nome ? `${nome} · Derma Match` : 'Derma Match';
+  }, [location.pathname]);
 
   async function aoSair() {
     await logout();
