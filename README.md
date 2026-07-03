@@ -4,6 +4,10 @@ Plataforma web de skincare personalizado. A partir de um questionário adaptativ
 identifica o tipo de pele predominante da usuária e entrega uma rotina de cuidados correspondente.
 Este repositório contém o **backend** (Node + Express + TypeScript, Postgres via Prisma).
 
+**Stack:** Node 22 · TypeScript strict · Express 5 · Prisma 6 / PostgreSQL 16 · Zod · JWT + bcrypt · Vitest.
+
+**Estado:** MVP backend concluído (Fases 0–4). Frontend não iniciado. Plano Premium adiado (Fase 5).
+
 ## Pré-requisitos
 
 - Node.js 22+
@@ -46,20 +50,24 @@ pnpm prisma db seed
 
 ## Scripts
 
-| Script           | O que faz                                          |
-| ---------------- | -------------------------------------------------- |
-| `pnpm dev`       | Sobe o servidor com reload automático (tsx watch). |
-| `pnpm build`     | Compila `src/` para `dist/`.                       |
-| `pnpm start`     | Roda a versão compilada (`dist/index.js`).         |
-| `pnpm typecheck` | Checagem de tipos sem emitir arquivos.             |
-| `pnpm lint`      | ESLint em todo o projeto.                          |
-| `pnpm lint:fix`  | ESLint corrigindo o que der.                       |
-| `pnpm format`    | Formata o código com Prettier.                     |
+| Script            | O que faz                                          |
+| ----------------- | -------------------------------------------------- |
+| `pnpm dev`        | Sobe o servidor com reload automático (tsx watch). |
+| `pnpm build`      | Compila `src/` para `dist/`.                       |
+| `pnpm start`      | Roda a versão compilada (`dist/index.js`).         |
+| `pnpm typecheck`  | Checagem de tipos sem emitir arquivos.             |
+| `pnpm lint`       | ESLint em todo o projeto.                          |
+| `pnpm lint:fix`   | ESLint corrigindo o que der.                       |
+| `pnpm format`     | Formata o código com Prettier.                     |
+| `pnpm test`       | Roda a suíte de testes (Vitest).                   |
+| `pnpm test:setup` | Prepara o banco de teste (migrations + seed).      |
 
-## Testando endpoints
+## Testes
 
-Os testes manuais de rota ficam em `.http/` (não versionada) e usam a extensão **REST Client**
-do VS Code. Veja `SETUP.md`.
+- **Automatizados:** `pnpm test:setup` (uma vez) e depois `pnpm test` — usam um schema Postgres
+  isolado. Detalhes em [`SETUP.md`](./SETUP.md).
+- **Manuais de rota:** ficam em `.http/` (não versionada) e usam a extensão **REST Client** do VS
+  Code. `.http/fluxo-completo.http` cobre a jornada ponta a ponta.
 
 ## Documentação do projeto
 

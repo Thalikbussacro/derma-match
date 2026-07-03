@@ -50,10 +50,22 @@ const perguntas: PerguntaDef[] = [
     texto: 'Como sua pele costuma ficar no fim do dia?',
     ordem: 1,
     opcoes: [
-      { chave: 'q1_brilhosa', texto: 'Brilhosa e oleosa no rosto todo', pesos: { oleosa: 3, mista: 1 } },
+      {
+        chave: 'q1_brilhosa',
+        texto: 'Brilhosa e oleosa no rosto todo',
+        pesos: { oleosa: 3, mista: 1 },
+      },
       { chave: 'q1_repuxada', texto: 'Repuxada e ressecada', pesos: { seca: 3 } },
-      { chave: 'q1_mista', texto: 'Oleosa na zona T e normal/seca nas bochechas', pesos: { mista: 3 } },
-      { chave: 'q1_confortavel', texto: 'Confortável, sem brilho nem repuxamento', pesos: { normal: 3 } },
+      {
+        chave: 'q1_mista',
+        texto: 'Oleosa na zona T e normal/seca nas bochechas',
+        pesos: { mista: 3 },
+      },
+      {
+        chave: 'q1_confortavel',
+        texto: 'Confortável, sem brilho nem repuxamento',
+        pesos: { normal: 3 },
+      },
       { chave: 'q1_sensivel', texto: 'Com vermelhidão ou ardência', pesos: { sensivel: 3 } },
     ],
   },
@@ -163,9 +175,17 @@ const rotinas: RotinaDef[] = [
     tipo: 'oleosa',
     descricao: 'Rotina focada em controle de oleosidade e desobstrução dos poros.',
     itens: [
-      { etapa: 'LIMPEZA', descricao: 'Gel de limpeza com ácido salicílico, de manhã e à noite.', ordem: 1 },
+      {
+        etapa: 'LIMPEZA',
+        descricao: 'Gel de limpeza com ácido salicílico, de manhã e à noite.',
+        ordem: 1,
+      },
       { etapa: 'TONIFICACAO', descricao: 'Tônico adstringente sem álcool.', ordem: 2 },
-      { etapa: 'TRATAMENTO', descricao: 'Sérum de niacinamida para controlar a oleosidade.', ordem: 3 },
+      {
+        etapa: 'TRATAMENTO',
+        descricao: 'Sérum de niacinamida para controlar a oleosidade.',
+        ordem: 3,
+      },
       { etapa: 'HIDRATACAO', descricao: 'Hidratante oil-free em gel.', ordem: 4 },
       { etapa: 'PROTECAO_SOLAR', descricao: 'Protetor solar toque seco FPS 30 ou mais.', ordem: 5 },
     ],
@@ -175,7 +195,11 @@ const rotinas: RotinaDef[] = [
     descricao: 'Rotina focada em hidratação intensa e reforço da barreira da pele.',
     itens: [
       { etapa: 'LIMPEZA', descricao: 'Loção de limpeza suave, sem sabonete.', ordem: 1 },
-      { etapa: 'TRATAMENTO', descricao: 'Sérum de ácido hialurônico antes do hidratante.', ordem: 2 },
+      {
+        etapa: 'TRATAMENTO',
+        descricao: 'Sérum de ácido hialurônico antes do hidratante.',
+        ordem: 2,
+      },
       { etapa: 'HIDRATACAO', descricao: 'Hidratante rico com ceramidas.', ordem: 3 },
       { etapa: 'PROTECAO_SOLAR', descricao: 'Protetor solar hidratante FPS 30 ou mais.', ordem: 4 },
     ],
@@ -187,7 +211,11 @@ const rotinas: RotinaDef[] = [
       { etapa: 'LIMPEZA', descricao: 'Gel de limpeza suave.', ordem: 1 },
       { etapa: 'TONIFICACAO', descricao: 'Tônico equilibrante, com foco na zona T.', ordem: 2 },
       { etapa: 'HIDRATACAO', descricao: 'Hidratante leve, reforçado nas bochechas.', ordem: 3 },
-      { etapa: 'PROTECAO_SOLAR', descricao: 'Protetor solar FPS 30 ou mais de textura leve.', ordem: 4 },
+      {
+        etapa: 'PROTECAO_SOLAR',
+        descricao: 'Protetor solar FPS 30 ou mais de textura leve.',
+        ordem: 4,
+      },
     ],
   },
   {
@@ -204,9 +232,21 @@ const rotinas: RotinaDef[] = [
     descricao: 'Rotina suave, com produtos calmantes e sem fragrância.',
     itens: [
       { etapa: 'LIMPEZA', descricao: 'Água micelar suave, sem esfregar.', ordem: 1 },
-      { etapa: 'TRATAMENTO', descricao: 'Sérum calmante com niacinamida em baixa concentração.', ordem: 2 },
-      { etapa: 'HIDRATACAO', descricao: 'Hidratante calmante com pantenol, sem fragrância.', ordem: 3 },
-      { etapa: 'PROTECAO_SOLAR', descricao: 'Protetor solar mineral FPS 30 ou mais para peles sensíveis.', ordem: 4 },
+      {
+        etapa: 'TRATAMENTO',
+        descricao: 'Sérum calmante com niacinamida em baixa concentração.',
+        ordem: 2,
+      },
+      {
+        etapa: 'HIDRATACAO',
+        descricao: 'Hidratante calmante com pantenol, sem fragrância.',
+        ordem: 3,
+      },
+      {
+        etapa: 'PROTECAO_SOLAR',
+        descricao: 'Protetor solar mineral FPS 30 ou mais para peles sensíveis.',
+        ordem: 4,
+      },
     ],
   },
 ];
