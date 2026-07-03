@@ -1,7 +1,7 @@
-import type { Anexo, Conversa } from '@prisma/client';
+import type { Conversa } from '@prisma/client';
 import type { ConversaResponse, MensagemResponse } from '@derma-match/shared';
 import { ForbiddenError, NotFoundError } from '../errors/http-error.js';
-import { anexoRepository } from '../repositories/anexo.repository.js';
+import { prisma } from '../lib/prisma.js';
 import { biomedicaRepository } from '../repositories/biomedica.repository.js';
 
 // Retenção LGPD: fotos expiram 90 dias após o envio (ADR-0011).
@@ -70,25 +70,25 @@ export const conversaService = {
     foto?: { caminhoRel: string; tipo: string },
   ): Promise<MensagemResponse> {
     const { conversa } = await obterOuCriarConversa(usuarioId);
-    const mensagem = await mensagemRepository.criar({
-      conversaId: conversa.id,
-      autorTipo: 'USUARIA',
-      autorId: usuarioId,
-      conteudo,
+    // Mensagem + anexo + atualização de atividade em uma transação (tudo ou nada).
+    const mensagem = await prisma.$transaction(async (tx) => {
+      const criada = await tx.mensagem.create({
+        data: { conversaId: conversa.id, autorTipo: 'USUARIA', autorId: usuarioId, conteudo },
+      });
+      if (foto) {
+        await tx.anexo.create({
+          data: {
+            mensagemId: criada.id,
+            tipo: foto.tipo,
+            caminho: foto.caminhoRel,
+            dataExpiracao: new Date(Date.now() + RETENCAO_ANEXO_MS),
+          },
+        });
+      }
+      await tx.conversa.update({ where: { id: conversa.id }, data: { ultimaAtividade: new Date() } });
+      return tx.mensagem.findUniqueOrThrow({ where: { id: criada.id }, include: { anexos: true } });
     });
-    const anexos: Anexo[] = [];
-    if (foto) {
-      anexos.push(
-        await anexoRepository.criar({
-          mensagemId: mensagem.id,
-          tipo: foto.tipo,
-          caminho: foto.caminhoRel,
-          dataExpiracao: new Date(Date.now() + RETENCAO_ANEXO_MS),
-        }),
-      );
-    }
-    await conversaRepository.atualizarUltimaAtividade(conversa.id);
-    return mensagemResponse({ ...mensagem, anexos });
+    return mensagemResponse(mensagem);
   },
 
   async listarMensagens(usuarioId: number): Promise<MensagemResponse[]> {

@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { ValidationError } from '../errors/http-error.js';
-import { caminhoRelativo } from '../lib/uploads.js';
+import { caminhoRelativo, removerArquivo } from '../lib/uploads.js';
 import { usuarioIdAutenticado } from '../lib/usuario-autenticado.js';
 import { conversaService } from '../services/conversa.service.js';
 
@@ -55,6 +55,10 @@ export const conversaController = {
       );
       res.status(201).json(mensagem);
     } catch (err) {
+      // Erro após o upload: remove o arquivo órfão (a transação garante que nada foi persistido).
+      if (req.file) {
+        void removerArquivo(caminhoRelativo(req.file.path));
+      }
       next(err);
     }
   },

@@ -28,3 +28,21 @@ export const recuperarSenhaLimiter = rateLimit({
     mensagem: 'Muitas solicitações de recuperação de senha. Tente novamente mais tarde.',
   },
 });
+
+// Chave por principal autenticado (usuária ou biomédica), sem colisão entre os tipos.
+function chavePorPrincipal(req: Request): string {
+  return req.usuario ? `${req.usuario.tipoUsuario}:${req.usuario.id}` : (req.ip ?? 'sem-ip');
+}
+
+// Freia envio de mensagens (inclui upload de foto) para evitar spam e abuso de disco.
+export const mensagemLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: chavePorPrincipal,
+  message: {
+    codigo: 'MUITAS_MENSAGENS',
+    mensagem: 'Você está enviando mensagens rápido demais. Aguarde um momento.',
+  },
+});

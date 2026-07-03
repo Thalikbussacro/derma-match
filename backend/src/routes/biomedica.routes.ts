@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { biomedicaAuthController } from '../controllers/biomedica-auth.controller.js';
 import { biomedicaConversaController } from '../controllers/biomedica-conversa.controller.js';
 import { exigirBiomedica } from '../middlewares/exigir-tipo.js';
-import { loginLimiter } from '../middlewares/rate-limit.js';
+import { loginLimiter, mensagemLimiter } from '../middlewares/rate-limit.js';
 
 export const biomedicaRouter = Router();
 
@@ -21,6 +21,7 @@ biomedicaRouter.get(
 biomedicaRouter.post(
   '/conversas/:id/mensagens',
   exigirBiomedica,
+  mensagemLimiter,
   biomedicaConversaController.responder,
 );
 biomedicaRouter.get(

@@ -18,6 +18,10 @@ const TAMANHO_MAX = 5 * 1024 * 1024; // 5MB
 const storage = multer.diskStorage({
   destination(req: Request, _file, cb) {
     const usuarioId = req.usuario?.id;
+    if (usuarioId === undefined) {
+      cb(new Error('Upload sem usuário autenticado.'), '');
+      return;
+    }
     const dir = path.join(UPLOADS_DIR, String(usuarioId));
     fs.mkdir(dir, { recursive: true }, (err) => cb(err, dir));
   },

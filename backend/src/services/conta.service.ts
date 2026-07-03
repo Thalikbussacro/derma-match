@@ -61,10 +61,11 @@ export const contaService = {
   },
 
   async excluir(usuarioId: number): Promise<void> {
+    // Remove as fotos do disco ANTES do delete no banco: se a remoção do disco falhar, o cascade
+    // ainda não rodou, então nada fica órfão e a operação pode ser repetida (LGPD).
+    await removerPastaUsuario(usuarioId);
     // Hard delete: o banco faz cascade em refresh tokens, respostas, conversas, mensagens e anexos
     // (onDelete: Cascade). (RNF-LGPD-002)
     await usuarioRepository.remover(usuarioId);
-    // As fotos da usuária no disco não saem por cascade — removidas explicitamente (LGPD).
-    await removerPastaUsuario(usuarioId);
   },
 };
