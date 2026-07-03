@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import { enviarMensagemSchema } from '@derma-match/shared';
 import { ValidationError } from '../errors/http-error.js';
-import { usuarioIdAutenticado } from '../lib/usuario-autenticado.js';
+import { biomedicaIdAutenticado } from '../lib/usuario-autenticado.js';
 import { biomedicaConversaService } from '../services/biomedica-conversa.service.js';
 
 function conversaIdParam(req: Request): number {
@@ -15,7 +15,7 @@ function conversaIdParam(req: Request): number {
 export const biomedicaConversaController = {
   listar: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const conversas = await biomedicaConversaService.listar(usuarioIdAutenticado(req));
+      const conversas = await biomedicaConversaService.listar(biomedicaIdAutenticado(req));
       res.status(200).json({ conversas });
     } catch (err) {
       next(err);
@@ -25,7 +25,7 @@ export const biomedicaConversaController = {
   listarMensagens: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const mensagens = await biomedicaConversaService.listarMensagens(
-        usuarioIdAutenticado(req),
+        biomedicaIdAutenticado(req),
         conversaIdParam(req),
       );
       res.status(200).json({ mensagens });
@@ -38,7 +38,7 @@ export const biomedicaConversaController = {
     try {
       const input = enviarMensagemSchema.parse(req.body);
       const mensagem = await biomedicaConversaService.responder(
-        usuarioIdAutenticado(req),
+        biomedicaIdAutenticado(req),
         conversaIdParam(req),
         input.conteudo,
       );
@@ -51,7 +51,7 @@ export const biomedicaConversaController = {
   contexto: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const contexto = await biomedicaConversaService.contexto(
-        usuarioIdAutenticado(req),
+        biomedicaIdAutenticado(req),
         conversaIdParam(req),
       );
       res.status(200).json(contexto);

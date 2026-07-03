@@ -21,16 +21,6 @@ export function useMensagens(habilitado: boolean) {
   });
 }
 
-export function useIniciarConversa() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: () => chatApi.iniciar(),
-    onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: CHAVE_CONVERSA });
-    },
-  });
-}
-
 export function useEnviarMensagem() {
   const qc = useQueryClient();
   return useMutation({

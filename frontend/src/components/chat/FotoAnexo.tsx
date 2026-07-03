@@ -19,9 +19,13 @@ export function FotoAnexo({
     void instance
       .get<Blob>(`/anexos/${anexoId}`, { responseType: 'blob' })
       .then((res) => {
-        objectUrl = URL.createObjectURL(res.data);
+        const criado = URL.createObjectURL(res.data);
         if (ativo) {
-          setUrl(objectUrl);
+          objectUrl = criado;
+          setUrl(criado);
+        } else {
+          // Desmontou antes do blob chegar: revoga na hora para não vazar.
+          URL.revokeObjectURL(criado);
         }
       })
       .catch(() => undefined);

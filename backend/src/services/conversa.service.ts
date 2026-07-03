@@ -45,7 +45,17 @@ async function obterOuCriarConversa(
     throw new NotFoundError('Biomédica');
   }
   let conversa = await conversaRepository.buscarDoUsuario(usuarioId);
-  conversa ??= await conversaRepository.criar(usuarioId, biomedica.id);
+  if (!conversa) {
+    try {
+      conversa = await conversaRepository.criar(usuarioId, biomedica.id);
+    } catch (err) {
+      // Corrida (violação do unique usuário+biomédica): reaproveita a conversa criada em paralelo.
+      conversa = await conversaRepository.buscarDoUsuario(usuarioId);
+      if (!conversa) {
+        throw err;
+      }
+    }
+  }
   return { conversa, biomedicaNome: biomedica.nome };
 }
 

@@ -9,3 +9,6 @@ export function usuarioIdAutenticado(req: Request): number {
   }
   return req.usuario.id;
 }
+
+// Mesmo id do principal autenticado, com nome explícito para as rotas da biomédica.
+export const biomedicaIdAutenticado = usuarioIdAutenticado;

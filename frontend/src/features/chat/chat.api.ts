@@ -7,11 +7,6 @@ export const chatApi = {
     return res.data.conversa;
   },
 
-  async iniciar(): Promise<ConversaResponse> {
-    const res = await api.post<ConversaResponse>('/conversa');
-    return res.data;
-  },
-
   async listarMensagens(): Promise<MensagemResponse[]> {
     const res = await api.get<{ mensagens: MensagemResponse[] }>('/conversa/mensagens');
     return res.data.mensagens;
