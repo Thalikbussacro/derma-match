@@ -20,6 +20,7 @@
     "test:setup": "tsx tests/setup-db.ts",
     "cleanup:tokens": "tsx src/scripts/limpar-refresh-tokens.ts",
     "cleanup:anexos": "tsx src/scripts/limpar-anexos.ts",
+    "cleanup:conversas": "tsx src/scripts/limpar-conversas.ts",
     "postinstall": "prisma generate"
   },
   "devDependencies": {

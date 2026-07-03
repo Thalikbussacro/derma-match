@@ -6,6 +6,8 @@ import { biomedicaRepository } from '../repositories/biomedica.repository.js';
 
 // Retenção LGPD: fotos expiram 90 dias após o envio (ADR-0011).
 const RETENCAO_ANEXO_MS = 90 * 24 * 60 * 60 * 1000;
+// Conversas inativas há mais de 12 meses são removidas (ADR-0014).
+const RETENCAO_CONVERSA_MS = 365 * 24 * 60 * 60 * 1000;
 import { conversaRepository } from '../repositories/conversa.repository.js';
 import type { MensagemComAnexos } from '../repositories/mensagem.repository.js';
 import { mensagemRepository } from '../repositories/mensagem.repository.js';
@@ -108,5 +110,11 @@ export const conversaService = {
     }
     const mensagens = await mensagemRepository.listarPorConversa(conversa.id);
     return mensagens.map(mensagemResponse);
+  },
+
+  // Retenção LGPD: remove conversas (e suas mensagens) inativas há mais de 12 meses.
+  async removerInativas(): Promise<number> {
+    const cutoff = new Date(Date.now() - RETENCAO_CONVERSA_MS);
+    return conversaRepository.removerInativas(cutoff);
   },
 };

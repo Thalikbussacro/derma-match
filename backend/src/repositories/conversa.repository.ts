@@ -33,4 +33,12 @@ export const conversaRepository = {
   buscarDaBiomedica(conversaId: number, biomedicaId: number): Promise<Conversa | null> {
     return prisma.conversa.findFirst({ where: { id: conversaId, biomedicaId } });
   },
+
+  // Remove conversas inativas (cascade apaga mensagens e anexos). Ver ADR-0014.
+  async removerInativas(anteriorA: Date): Promise<number> {
+    const resultado = await prisma.conversa.deleteMany({
+      where: { ultimaAtividade: { lt: anteriorA } },
+    });
+    return resultado.count;
+  },
 };
