@@ -1,15 +1,20 @@
-import { createHash } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import bcrypt from 'bcrypt';
 import type { Usuario } from '@prisma/client';
+import { env } from '../config/env.js';
 import { ConflictError, UnauthorizedError } from '../errors/http-error.js';
+import { logger } from '../lib/logger.js';
 import { refreshTokenRepository } from '../repositories/refresh-token.repository.js';
+import { tokenRecuperacaoSenhaRepository } from '../repositories/token-recuperacao-senha.repository.js';
 import { usuarioRepository } from '../repositories/usuario.repository.js';
 import type { CadastroInput, LoginInput, UsuarioResponse } from '../schemas/auth.schema.js';
+import { emailService } from './email.service.js';
 import { tokenService } from './token.service.js';
 
 const CUSTO_BCRYPT = 10;
 const MAX_TENTATIVAS_LOGIN = 5;
 const BLOQUEIO_LOGIN_MS = 15 * 60 * 1000;
+const RECUPERACAO_SENHA_MS = 60 * 60 * 1000;
 
 export interface LoginResultado {
   usuario: UsuarioResponse;
@@ -135,5 +140,47 @@ export const authService = {
     if (registro && registro.revogadoEm === null) {
       await refreshTokenRepository.revogar(registro.id);
     }
+  },
+
+  async solicitarRecuperacaoSenha(email: string): Promise<void> {
+    const usuario = await usuarioRepository.buscarPorEmail(email);
+    // Não revela se o email existe (RF-AUTH-009): retorna sucesso de qualquer forma.
+    if (!usuario) {
+      return;
+    }
+
+    // Uma nova solicitação invalida as anteriores.
+    await tokenRecuperacaoSenhaRepository.invalidarTodosDoUsuario(usuario.id);
+
+    const tokenCru = randomBytes(32).toString('hex');
+    await tokenRecuperacaoSenhaRepository.criar({
+      usuarioId: usuario.id,
+      tokenHash: hashSha256(tokenCru),
+      expiraEm: new Date(Date.now() + RECUPERACAO_SENHA_MS),
+    });
+
+    const link = `${env.APP_URL}/redefinir-senha?token=${tokenCru}`;
+    try {
+      await emailService.enviarEmailRecuperacaoSenha(usuario.email, link);
+    } catch (err) {
+      // Falha de SMTP nunca vaza para a resposta HTTP (RNF-SEC): loga e segue.
+      logger.error({ err }, 'falha ao enviar email de recuperação de senha');
+    }
+  },
+
+  async redefinirSenha(tokenCru: string, novaSenha: string): Promise<void> {
+    const registro = await tokenRecuperacaoSenhaRepository.buscarPorHash(hashSha256(tokenCru));
+    if (!registro || registro.usadoEm !== null || registro.expiraEm.getTime() < Date.now()) {
+      throw new UnauthorizedError(
+        'Token de recuperação inválido ou expirado.',
+        'TOKEN_RECUPERACAO_INVALIDO',
+      );
+    }
+
+    await tokenRecuperacaoSenhaRepository.marcarUsado(registro.id);
+    const senhaHash = await bcrypt.hash(novaSenha, CUSTO_BCRYPT);
+    await usuarioRepository.atualizar(registro.usuarioId, { senhaHash });
+    // Troca de senha força re-login: revoga todos os refresh tokens do usuário.
+    await refreshTokenRepository.revogarTodosDoUsuario(registro.usuarioId);
   },
 };

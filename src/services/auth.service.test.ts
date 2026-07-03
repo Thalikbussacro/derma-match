@@ -1,7 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { usuarioRepository } from '../repositories/usuario.repository.js';
 import { cadastroSchema } from '../schemas/auth.schema.js';
 import { authService } from './auth.service.js';
+import { emailService } from './email.service.js';
+
+vi.mock('./email.service.js', () => ({
+  emailService: { enviarEmailRecuperacaoSenha: vi.fn() },
+}));
 
 const inputValido = {
   nome: 'Maria',
@@ -131,5 +136,65 @@ describe('authService.login — bloqueio por tentativas', () => {
       senha: inputValido.senha,
     });
     expect(resultado.accessToken.length).toBeGreaterThan(0);
+  });
+});
+
+describe('authService — recuperação de senha', () => {
+  beforeEach(() => {
+    vi.mocked(emailService.enviarEmailRecuperacaoSenha).mockClear();
+  });
+
+  function extrairToken(): string {
+    const link = vi.mocked(emailService.enviarEmailRecuperacaoSenha).mock.calls[0]?.[1] ?? '';
+    return new URL(link).searchParams.get('token') ?? '';
+  }
+
+  it('envia email para email existente', async () => {
+    await authService.cadastrar(inputValido);
+    await authService.solicitarRecuperacaoSenha(inputValido.email);
+    expect(emailService.enviarEmailRecuperacaoSenha).toHaveBeenCalledOnce();
+  });
+
+  it('responde igual e não envia email para email inexistente', async () => {
+    await expect(
+      authService.solicitarRecuperacaoSenha('naoexiste@example.com'),
+    ).resolves.toBeUndefined();
+    expect(emailService.enviarEmailRecuperacaoSenha).not.toHaveBeenCalled();
+  });
+
+  it('redefine a senha com token válido e força logout global', async () => {
+    await authService.cadastrar(inputValido);
+    const login = await authService.login({ email: inputValido.email, senha: inputValido.senha });
+    await authService.solicitarRecuperacaoSenha(inputValido.email);
+
+    const token = extrairToken();
+    expect(token.length).toBeGreaterThan(0);
+    await authService.redefinirSenha(token, 'novaSenha123');
+
+    const novoLogin = await authService.login({
+      email: inputValido.email,
+      senha: 'novaSenha123',
+    });
+    expect(novoLogin.accessToken.length).toBeGreaterThan(0);
+    // logout global: o refresh anterior foi revogado
+    await expect(authService.refresh(login.refreshToken)).rejects.toThrow();
+  });
+
+  it('rejeita token de recuperação já usado', async () => {
+    await authService.cadastrar(inputValido);
+    await authService.solicitarRecuperacaoSenha(inputValido.email);
+    const token = extrairToken();
+
+    await authService.redefinirSenha(token, 'outraSenha123');
+    await expect(authService.redefinirSenha(token, 'maisUma123')).rejects.toThrow();
+  });
+
+  it('nova solicitação invalida o token anterior', async () => {
+    await authService.cadastrar(inputValido);
+    await authService.solicitarRecuperacaoSenha(inputValido.email);
+    const tokenAntigo = extrairToken();
+
+    await authService.solicitarRecuperacaoSenha(inputValido.email);
+    await expect(authService.redefinirSenha(tokenAntigo, 'novaSenha123')).rejects.toThrow();
   });
 });

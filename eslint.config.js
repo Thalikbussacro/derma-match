@@ -23,5 +23,12 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Testes referenciam métodos para asserção/mocking; a regra unbound-method é ruído aqui.
+    files: ['**/*.test.ts', 'tests/**/*.ts'],
+    rules: {
+      '@typescript-eslint/unbound-method': 'off',
+    },
+  },
   eslintConfigPrettier,
 );

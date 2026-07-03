@@ -1,7 +1,12 @@
 import type { NextFunction, Request, Response } from 'express';
 import { env } from '../config/env.js';
 import { UnauthorizedError } from '../errors/http-error.js';
-import { cadastroSchema, loginSchema } from '../schemas/auth.schema.js';
+import {
+  cadastroSchema,
+  loginSchema,
+  recuperarSenhaSchema,
+  redefinirSenhaSchema,
+} from '../schemas/auth.schema.js';
 import { authService } from '../services/auth.service.js';
 
 const COOKIE_REFRESH = 'refreshToken';
@@ -65,6 +70,29 @@ export const authController = {
       }
       res.clearCookie(COOKIE_REFRESH, { path: PATH_REFRESH });
       res.status(204).end();
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  recuperarSenha: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const input = recuperarSenhaSchema.parse(req.body);
+      await authService.solicitarRecuperacaoSenha(input.email);
+      // Resposta idêntica exista ou não o email (RF-AUTH-009).
+      res.status(200).json({
+        mensagem: 'Se o email estiver cadastrado, você receberá as instruções de recuperação.',
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  redefinirSenha: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const input = redefinirSenhaSchema.parse(req.body);
+      await authService.redefinirSenha(input.token, input.novaSenha);
+      res.status(200).json({ mensagem: 'Senha redefinida com sucesso.' });
     } catch (err) {
       next(err);
     }
