@@ -17,10 +17,12 @@ export function useMensagensBiomedica(conversaId: number) {
   });
 }
 
-export function useContextoClinico(conversaId: number) {
+export function useContextoClinico(conversaId: number, habilitado: boolean) {
   return useQuery({
     queryKey: ['biomedica', 'contexto', conversaId],
     queryFn: () => biomedicaApi.contexto(conversaId),
+    // Só busca as respostas (PII) quando o painel de contexto é aberto (minimização).
+    enabled: habilitado,
   });
 }
 

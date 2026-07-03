@@ -35,7 +35,7 @@ export function BiomedicaDashboardPage() {
                 <div className="flex items-center justify-between gap-2">
                   <p className="font-semibold text-neutral-800">{c.usuarioNome}</p>
                   {c.naoRespondida && (
-                    <span className="shrink-0 rounded-full bg-accent-500 px-2 py-0.5 text-xs font-medium text-white">
+                    <span className="shrink-0 rounded-full bg-accent-600 px-2 py-0.5 text-xs font-medium text-white">
                       responder
                     </span>
                   )}

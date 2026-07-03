@@ -42,14 +42,14 @@ export function ChatPage() {
     );
   }
 
-  function aoEnviar(e: FormEvent) {
-    e.preventDefault();
-    const conteudo = texto.trim();
-    if (!conteudo && !foto) {
+  const semConteudo = !texto.trim() && !foto;
+
+  function enviarAgora() {
+    if (semConteudo) {
       return;
     }
     enviar.mutate(
-      { conteudo, foto },
+      { conteudo: texto.trim(), foto },
       {
         onSuccess: () => {
           setTexto('');
@@ -57,6 +57,11 @@ export function ChatPage() {
         },
       },
     );
+  }
+
+  function aoEnviar(e: FormEvent) {
+    e.preventDefault();
+    enviarAgora();
   }
 
   return (
@@ -68,13 +73,23 @@ export function ChatPage() {
         <p className="text-xs text-neutral-500">Biomédica · responde em breve</p>
       </div>
 
-      <div className="flex min-h-[50vh] flex-col gap-2 rounded-2xl border border-neutral-200 bg-white p-3">
+      <div
+        role="log"
+        aria-live="polite"
+        aria-relevant="additions"
+        aria-label="Mensagens da conversa"
+        className="flex min-h-[50vh] flex-col gap-2 rounded-2xl border border-neutral-200 bg-white p-3"
+      >
         {mensagensQuery.isLoading ? (
           <div className="flex flex-1 items-center justify-center text-brand-500">
             <Spinner />
           </div>
+        ) : mensagensQuery.isError ? (
+          <p className="m-auto text-sm text-red-600">
+            Não foi possível carregar as mensagens. Tente recarregar.
+          </p>
         ) : mensagens.length === 0 ? (
-          <p className="m-auto text-sm text-neutral-400">Envie sua primeira mensagem.</p>
+          <p className="m-auto text-sm text-neutral-500">Envie sua primeira mensagem.</p>
         ) : (
           mensagens.map((m) => (
             <div
@@ -84,7 +99,7 @@ export function ChatPage() {
               <div
                 className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
                   m.autorTipo === 'USUARIA'
-                    ? 'bg-brand-500 text-white'
+                    ? 'bg-brand-600 text-white'
                     : 'bg-neutral-100 text-neutral-800'
                 }`}
               >
@@ -105,34 +120,48 @@ export function ChatPage() {
 
       <form onSubmit={aoEnviar} className="flex flex-col gap-2">
         {foto && (
-          <div className="flex items-center justify-between rounded-lg bg-brand-50 px-3 py-1 text-xs text-brand-700">
-            <span>📎 {foto.name}</span>
-            <button type="button" onClick={() => setFoto(null)} className="font-bold">
+          <div className="flex items-center justify-between gap-2 rounded-lg bg-brand-50 px-3 py-1 text-xs text-brand-700">
+            <span className="min-w-0 truncate">📎 {foto.name}</span>
+            <button
+              type="button"
+              onClick={() => setFoto(null)}
+              aria-label="Remover foto"
+              className="shrink-0 font-bold"
+            >
               ×
             </button>
           </div>
         )}
         <div className="flex items-end gap-2">
           <label
-            className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-neutral-300 text-lg"
-            title="Anexar foto"
+            htmlFor="foto-chat"
+            className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-neutral-300 text-lg focus-within:ring-2 focus-within:ring-brand-300"
           >
-            📷
+            <span aria-hidden="true">📷</span>
             <input
+              id="foto-chat"
               type="file"
               accept="image/*"
-              className="hidden"
+              aria-label="Anexar foto"
+              className="sr-only"
               onChange={(e) => setFoto(e.target.files?.[0] ?? null)}
             />
           </label>
           <textarea
             value={texto}
             onChange={(e) => setTexto(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                enviarAgora();
+              }
+            }}
             rows={1}
+            aria-label="Escreva uma mensagem"
             placeholder="Escreva uma mensagem…"
             className="min-h-11 flex-1 resize-none rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
           />
-          <Button type="submit" loading={enviar.isPending}>
+          <Button type="submit" loading={enviar.isPending} disabled={semConteudo}>
             Enviar
           </Button>
         </div>

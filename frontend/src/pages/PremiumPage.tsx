@@ -54,7 +54,9 @@ export function PremiumPage() {
         <ul className="flex flex-col gap-3">
           {data.beneficios.map((beneficio) => (
             <li key={beneficio} className="flex items-start gap-2 text-sm text-neutral-700">
-              <span className="font-bold text-accent-500">✓</span>
+              <span className="font-bold text-brand-600" aria-hidden="true">
+                ✓
+              </span>
               <span>{beneficio}</span>
             </li>
           ))}
@@ -75,7 +77,7 @@ export function PremiumPage() {
           <Button fullWidth loading={assinando} onClick={() => void assinar()}>
             Assinar Premium
           </Button>
-          <p className="text-center text-xs text-neutral-400">
+          <p className="text-center text-xs text-neutral-500">
             Simulação — sem cobrança real (projeto acadêmico).
           </p>
         </>

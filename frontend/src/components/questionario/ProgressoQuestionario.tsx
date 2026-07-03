@@ -13,7 +13,14 @@ export function ProgressoQuestionario({ respondidas, total }: ProgressoQuestiona
         </span>
         <span>{pct}%</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-neutral-200">
+      <div
+        role="progressbar"
+        aria-valuenow={pct}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Progresso do questionário"
+        className="h-2 overflow-hidden rounded-full bg-neutral-200"
+      >
         <div
           className="h-full rounded-full bg-brand-500 transition-all"
           style={{ width: `${pct}%` }}
