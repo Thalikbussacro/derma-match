@@ -19,4 +19,9 @@ export const contaApi = {
   async excluir(): Promise<void> {
     await api.delete('/me');
   },
+
+  async exportarDados(): Promise<unknown> {
+    const res = await api.get<unknown>('/me/dados');
+    return res.data;
+  },
 };

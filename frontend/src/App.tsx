@@ -6,6 +6,7 @@ import { CadastroPage } from './pages/CadastroPage';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { NotFound } from './pages/NotFound';
+import { PrivacidadePage } from './pages/PrivacidadePage';
 import { QuestionarioPage } from './pages/QuestionarioPage';
 import { RecuperarSenhaPage } from './pages/RecuperarSenhaPage';
 import { RedefinirSenhaPage } from './pages/RedefinirSenhaPage';
@@ -44,6 +45,7 @@ export default function App() {
           />
           <Route path="/recuperar-senha" element={<RecuperarSenhaPage />} />
           <Route path="/redefinir-senha" element={<RedefinirSenhaPage />} />
+          <Route path="/privacidade" element={<PrivacidadePage />} />
 
           {/* Privadas */}
           <Route

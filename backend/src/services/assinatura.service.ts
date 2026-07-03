@@ -24,7 +24,11 @@ export const assinaturaService = {
     if (usuario.plano === 'PREMIUM') {
       throw new ConflictError('Você já tem o plano Premium.');
     }
-    const atualizado = await usuarioRepository.atualizar(usuarioId, { plano: 'PREMIUM' });
+    // Registra o consentimento específico para dados sensíveis de saúde (ADR-0013).
+    const atualizado = await usuarioRepository.atualizar(usuarioId, {
+      plano: 'PREMIUM',
+      consentimentoDadosSensiveisEm: new Date(),
+    });
     return paraResponse(atualizado);
   },
 

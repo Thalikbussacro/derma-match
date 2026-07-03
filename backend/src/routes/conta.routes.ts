@@ -4,5 +4,6 @@ import { contaController } from '../controllers/conta.controller.js';
 export const contaRouter = Router();
 
 contaRouter.get('/', contaController.buscarPerfil);
+contaRouter.get('/dados', contaController.exportarDados);
 contaRouter.patch('/', contaController.atualizar);
 contaRouter.delete('/', contaController.excluir);

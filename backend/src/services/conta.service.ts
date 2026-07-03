@@ -2,7 +2,10 @@ import bcrypt from 'bcrypt';
 import type { Usuario } from '@prisma/client';
 import { NotFoundError, UnauthorizedError } from '../errors/http-error.js';
 import { removerPastaUsuario } from '../lib/uploads.js';
+import { conversaRepository } from '../repositories/conversa.repository.js';
+import { mensagemRepository } from '../repositories/mensagem.repository.js';
 import { refreshTokenRepository } from '../repositories/refresh-token.repository.js';
+import { respostaUsuarioRepository } from '../repositories/resposta-usuario.repository.js';
 import { usuarioRepository } from '../repositories/usuario.repository.js';
 import type { UsuarioResponse } from '../schemas/auth.schema.js';
 import type { AtualizarContaInput } from '../schemas/conta.schema.js';
@@ -26,6 +29,46 @@ export const contaService = {
       throw new NotFoundError('Usuário');
     }
     return paraResponse(usuario);
+  },
+
+  // Exportação dos dados da própria usuária em JSON (portabilidade — Art. 18 V da LGPD).
+  async exportarDados(usuarioId: number): Promise<unknown> {
+    const usuario = await usuarioRepository.buscarPorId(usuarioId);
+    if (!usuario) {
+      throw new NotFoundError('Usuário');
+    }
+    const respostas = await respostaUsuarioRepository.listarComContexto(usuarioId);
+    const conversa = await conversaRepository.buscarDoUsuario(usuarioId);
+    const mensagens = conversa ? await mensagemRepository.listarPorConversa(conversa.id) : [];
+
+    return {
+      exportadoEm: new Date().toISOString(),
+      perfil: {
+        nome: usuario.nome,
+        email: usuario.email,
+        plano: usuario.plano,
+        tipoPelePredominanteId: usuario.tipoPelePredominanteId,
+        criadoEm: usuario.criadoEm.toISOString(),
+        consentimentoLgpdEm: usuario.consentimentoLgpdEm.toISOString(),
+        consentimentoVersao: usuario.consentimentoVersao,
+        consentimentoDadosSensiveisEm: usuario.consentimentoDadosSensiveisEm?.toISOString() ?? null,
+      },
+      questionario: respostas.map((r) => ({ pergunta: r.pergunta.texto, resposta: r.opcao.texto })),
+      conversa: conversa
+        ? {
+            iniciadaEm: conversa.criadoEm.toISOString(),
+            mensagens: mensagens.map((m) => ({
+              autor: m.autorTipo,
+              conteudo: m.conteudo,
+              criadoEm: m.criadoEm.toISOString(),
+              anexos: m.anexos.map((a) => ({
+                tipo: a.tipo,
+                expiraEm: a.dataExpiracao.toISOString(),
+              })),
+            })),
+          }
+        : null,
+    };
   },
 
   async atualizar(usuarioId: number, input: AtualizarContaInput): Promise<UsuarioResponse> {

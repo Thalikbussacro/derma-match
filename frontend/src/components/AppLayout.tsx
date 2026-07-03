@@ -13,6 +13,7 @@ const TITULOS: Record<string, string> = {
   '/premium': 'Premium',
   '/chat': 'Atendimento',
   '/conta': 'Minha conta',
+  '/privacidade': 'Privacidade',
 };
 
 export function AppLayout() {

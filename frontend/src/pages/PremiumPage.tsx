@@ -15,6 +15,7 @@ export function PremiumPage() {
   const { data, isLoading, isError } = usePainelUpgrade();
   const [assinando, setAssinando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [consentiu, setConsentiu] = useState(false);
 
   const ehPremium = usuario?.plano === 'PREMIUM';
 
@@ -74,7 +75,33 @@ export function PremiumPage() {
         <>
           <Alert tipo="info">{data.aviso}</Alert>
           {erro && <Alert tipo="erro">{erro}</Alert>}
-          <Button fullWidth loading={assinando} onClick={() => void assinar()}>
+          <label className="flex items-start gap-2 rounded-lg bg-brand-50 p-3 text-sm text-neutral-700">
+            <input
+              type="checkbox"
+              checked={consentiu}
+              onChange={(e) => setConsentiu(e.target.checked)}
+              className="mt-0.5 h-4 w-4 accent-brand-600"
+            />
+            <span>
+              Consinto com o tratamento das minhas fotos e respostas (dados de saúde) para análise
+              dermatológica pela biomédica, conforme a{' '}
+              <Link
+                to="/privacidade"
+                target="_blank"
+                onClick={(e) => e.stopPropagation()}
+                className="text-brand-600 underline"
+              >
+                política de privacidade
+              </Link>
+              .
+            </span>
+          </label>
+          <Button
+            fullWidth
+            loading={assinando}
+            disabled={!consentiu}
+            onClick={() => void assinar()}
+          >
             Assinar Premium
           </Button>
           <p className="text-center text-xs text-neutral-500">

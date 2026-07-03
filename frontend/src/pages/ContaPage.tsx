@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
@@ -14,6 +14,7 @@ import {
   type EditarNomeForm,
   type TrocarSenhaForm,
 } from '../features/conta/conta.schemas';
+import { contaApi } from '../features/conta/conta.api';
 import { useAtualizarConta, useExcluirConta, usePerfil } from '../features/conta/useConta';
 import { premiumApi } from '../features/premium/premium.api';
 import { mensagemDeErro } from '../lib/erros';
@@ -33,6 +34,7 @@ export function ContaPage() {
   const [cancelandoPremium, setCancelandoPremium] = useState(false);
   const [confirmandoCancel, setConfirmandoCancel] = useState(false);
   const [erroCancel, setErroCancel] = useState<string | null>(null);
+  const [baixando, setBaixando] = useState(false);
 
   const perfil = perfilQuery.data;
 
@@ -74,6 +76,22 @@ export function ContaPage() {
       void navigate('/login', { replace: true });
     } catch (erro) {
       setErroExclusao(mensagemDeErro(erro, 'Não foi possível excluir a conta.'));
+    }
+  }
+
+  async function baixarDados() {
+    setBaixando(true);
+    try {
+      const dados = await contaApi.exportarDados();
+      const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'meus-dados-derma-match.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setBaixando(false);
     }
   }
 
@@ -213,6 +231,21 @@ export function ContaPage() {
             Trocar senha
           </Button>
         </form>
+      </Card>
+
+      <Card>
+        <h2 className="font-semibold text-neutral-800">Privacidade e dados</h2>
+        <p className="mt-1 text-sm text-neutral-600">
+          Baixe uma cópia dos seus dados ou consulte como tratamos suas informações.
+        </p>
+        <div className="mt-3 flex flex-col gap-2">
+          <Button variant="secondary" loading={baixando} onClick={() => void baixarDados()}>
+            Baixar meus dados
+          </Button>
+          <Link to="/privacidade" className="text-center text-sm text-brand-600 hover:underline">
+            Política de privacidade
+          </Link>
+        </div>
       </Card>
 
       <Card className="border-red-200">

@@ -80,7 +80,18 @@ export function CadastroPage() {
                 className="mt-0.5 h-4 w-4 accent-brand-600"
                 {...register('aceiteLgpd')}
               />
-              <span>Li e aceito os termos de uso e a política de privacidade (LGPD).</span>
+              <span>
+                Li e aceito os termos de uso e a{' '}
+                <Link
+                  to="/privacidade"
+                  target="_blank"
+                  onClick={(e) => e.stopPropagation()}
+                  className="text-brand-600 underline"
+                >
+                  política de privacidade
+                </Link>{' '}
+                (LGPD).
+              </span>
             </label>
             {errors.aceiteLgpd && (
               <span className="text-xs text-red-600">{errors.aceiteLgpd.message}</span>
