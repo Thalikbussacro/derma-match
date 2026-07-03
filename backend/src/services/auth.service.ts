@@ -122,6 +122,10 @@ export const authService = {
     if (!registro) {
       throw new UnauthorizedError('Refresh token inválido ou revogado.', 'REFRESH_INVALIDO');
     }
+    // Este fluxo é o da usuária: um token sem usuarioId (de biomédica) não é aceito aqui.
+    if (registro.usuarioId === null) {
+      throw new UnauthorizedError('Refresh token inválido ou revogado.', 'REFRESH_INVALIDO');
+    }
     // Reuso de um refresh já revogado indica possível roubo: revoga toda a família do usuário.
     if (registro.revogadoEm !== null) {
       await refreshTokenRepository.revogarTodosDoUsuario(registro.usuarioId);

@@ -27,13 +27,13 @@ model TipoPele {
 }
 
 model Usuario {
-  id                     Int      @id @default(autoincrement())
-  nome                   String   @db.VarChar(120)
-  email                  String   @unique @db.VarChar(160)
-  senhaHash              String   @map("senha_hash") @db.VarChar(255)
-  plano                  Plano    @default(FREE)
-  tipoPelePredominanteId Int?     @map("tipo_pele_predominante_id")
-  consentimentoLgpdEm    DateTime @map("consentimento_lgpd_em")
+  id                     Int       @id @default(autoincrement())
+  nome                   String    @db.VarChar(120)
+  email                  String    @unique @db.VarChar(160)
+  senhaHash              String    @map("senha_hash") @db.VarChar(255)
+  plano                  Plano     @default(FREE)
+  tipoPelePredominanteId Int?      @map("tipo_pele_predominante_id")
+  consentimentoLgpdEm    DateTime  @map("consentimento_lgpd_em")
   criadoEm               DateTime  @default(now()) @map("criado_em")
   atualizadoEm           DateTime  @updatedAt @map("atualizado_em")
   tentativasLoginFalhas  Int       @default(0) @map("tentativas_login_falhas")
@@ -43,21 +43,26 @@ model Usuario {
   refreshTokens          RefreshToken[]
   tokensRecuperacaoSenha TokenRecuperacaoSenha[]
   respostas              RespostaUsuario[]
+  conversas              Conversa[]
 
   @@map("usuarios")
 }
 
 model RefreshToken {
-  id         Int       @id @default(autoincrement())
-  usuarioId  Int       @map("usuario_id")
-  tokenHash  String    @unique @map("token_hash") @db.VarChar(255)
-  expiraEm   DateTime  @map("expira_em")
-  revogadoEm DateTime? @map("revogado_em")
-  criadoEm   DateTime  @default(now()) @map("criado_em")
+  id          Int       @id @default(autoincrement())
+  usuarioId   Int?      @map("usuario_id")
+  biomedicaId Int?      @map("biomedica_id")
+  tokenHash   String    @unique @map("token_hash") @db.VarChar(255)
+  expiraEm    DateTime  @map("expira_em")
+  revogadoEm  DateTime? @map("revogado_em")
+  criadoEm    DateTime  @default(now()) @map("criado_em")
 
-  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuario   Usuario?   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  biomedica Biomedica? @relation(fields: [biomedicaId], references: [id], onDelete: Cascade)
 
+  // XOR (exatamente um dono: usuária ou biomédica) garantido por check constraint na migração.
   @@index([usuarioId, revogadoEm])
+  @@index([biomedicaId, revogadoEm])
   @@map("refresh_tokens")
 }
 
@@ -161,4 +166,73 @@ model ItemRotina {
 
   @@index([rotinaId, ordem])
   @@map("itens_rotina")
+}
+
+// --- Premium (Fase 5) ---
+
+model Biomedica {
+  id           Int      @id @default(autoincrement())
+  nome         String   @db.VarChar(120)
+  registro     String   @unique @db.VarChar(40) // registro profissional (ex.: CRBM)
+  email        String   @unique @db.VarChar(160)
+  senhaHash    String   @map("senha_hash") @db.VarChar(255)
+  ativa        Boolean  @default(true)
+  criadoEm     DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  refreshTokens RefreshToken[]
+  conversas     Conversa[]
+
+  @@map("biomedicas")
+}
+
+model Conversa {
+  id              Int      @id @default(autoincrement())
+  usuarioId       Int      @map("usuario_id")
+  biomedicaId     Int      @map("biomedica_id")
+  criadoEm        DateTime @default(now()) @map("criado_em")
+  ultimaAtividade DateTime @default(now()) @map("ultima_atividade")
+
+  usuario   Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  biomedica Biomedica  @relation(fields: [biomedicaId], references: [id])
+  mensagens Mensagem[]
+
+  // Uma conversa por par (usuária, biomédica).
+  @@unique([usuarioId, biomedicaId])
+  @@index([biomedicaId, ultimaAtividade])
+  @@map("conversas")
+}
+
+enum AutorMensagem {
+  USUARIA
+  BIOMEDICA
+}
+
+model Mensagem {
+  id         Int           @id @default(autoincrement())
+  conversaId Int           @map("conversa_id")
+  autorTipo  AutorMensagem @map("autor_tipo")
+  autorId    Int           @map("autor_id")
+  conteudo   String
+  criadoEm   DateTime      @default(now()) @map("criado_em")
+
+  conversa Conversa @relation(fields: [conversaId], references: [id], onDelete: Cascade)
+  anexos   Anexo[]
+
+  @@index([conversaId, criadoEm])
+  @@map("mensagens")
+}
+
+model Anexo {
+  id            Int      @id @default(autoincrement())
+  mensagemId    Int      @map("mensagem_id")
+  tipo          String   @db.VarChar(100) // mime type
+  caminho       String // caminho no storage local
+  dataExpiracao DateTime @map("data_expiracao")
+  criadoEm      DateTime @default(now()) @map("criado_em")
+
+  mensagem Mensagem @relation(fields: [mensagemId], references: [id], onDelete: Cascade)
+
+  @@index([dataExpiracao])
+  @@map("anexos")
 }

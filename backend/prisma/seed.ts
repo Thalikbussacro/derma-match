@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import type { EtapaRotina } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -344,17 +345,34 @@ async function seedRotinas(tiposPeleIds: Map<TipoNome, number>): Promise<void> {
   }
 }
 
+// Uma biomédica única (ADR-0011): novas usuárias Premium são associadas a ela.
+async function seedBiomedica(): Promise<void> {
+  const senhaHash = await bcrypt.hash('biomedica123', 10);
+  await prisma.biomedica.upsert({
+    where: { email: 'biomedica@dermamatch.com' },
+    update: {},
+    create: {
+      nome: 'Dra. Helena Costa',
+      registro: 'CRBM-12345',
+      email: 'biomedica@dermamatch.com',
+      senhaHash,
+      ativa: true,
+    },
+  });
+}
+
 async function main(): Promise<void> {
   const tiposPeleIds = await seedTiposPele();
   await seedQuestionario(tiposPeleIds);
   await seedRotinas(tiposPeleIds);
+  await seedBiomedica();
 }
 
 try {
   await main();
   console.log(
     `seed concluído: ${tiposPele.length} tipos de pele, ${perguntas.length} perguntas, ` +
-      `${rotinas.length} rotinas.`,
+      `${rotinas.length} rotinas, 1 biomédica.`,
   );
 } catch (err) {
   console.error('falha no seed:', err);
