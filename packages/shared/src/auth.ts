@@ -48,3 +48,11 @@ export const usuarioResponseSchema = z.object({
   tipoPelePredominanteId: z.number().nullable(),
 });
 export type UsuarioResponse = z.infer<typeof usuarioResponseSchema>;
+
+export const biomedicaResponseSchema = z.object({
+  id: z.number(),
+  nome: z.string(),
+  registro: z.string(),
+  email: z.string(),
+});
+export type BiomedicaResponse = z.infer<typeof biomedicaResponseSchema>;

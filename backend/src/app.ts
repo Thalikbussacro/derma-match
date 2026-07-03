@@ -51,6 +51,9 @@ const rotasPublicas = new Set([
   'POST /api/auth/logout',
   'POST /api/auth/recuperar-senha',
   'POST /api/auth/redefinir-senha',
+  'POST /api/biomedica/login',
+  'POST /api/biomedica/refresh',
+  'POST /api/biomedica/logout',
   'GET /api/health',
 ]);
 
