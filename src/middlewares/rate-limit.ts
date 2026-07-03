@@ -14,7 +14,7 @@ export const loginLimiter = rateLimit({
 
 function chavePorEmail(req: Request): string {
   const body = req.body as { email?: unknown };
-  return typeof body.email === 'string' ? body.email.toLowerCase() : (req.ip ?? 'sem-ip');
+  return typeof body.email === 'string' ? body.email.trim().toLowerCase() : (req.ip ?? 'sem-ip');
 }
 
 export const recuperarSenhaLimiter = rateLimit({

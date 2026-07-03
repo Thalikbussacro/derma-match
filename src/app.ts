@@ -13,6 +13,9 @@ import { authenticate } from './middlewares/authenticate.js';
 
 export const app = express();
 
+// Confia em N proxies à frente (afeta req.ip, base do rate limit por IP). Ver env TRUST_PROXY.
+app.set('trust proxy', env.TRUST_PROXY);
+
 app.use(
   pinoHttp({
     logger,

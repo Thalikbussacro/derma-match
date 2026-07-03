@@ -24,6 +24,9 @@ const envSchema = z.object({
   SMTP_PASS: z.string().default(''),
   EMAIL_FROM: z.string().default('Derma Match <nao-responda@dermamatch.local>'),
   APP_URL: z.string().url().default('http://localhost:5173'),
+  // Nº de proxies confiáveis à frente da app (Express trust proxy). 0 = app exposta direto (dev).
+  // Atrás de nginx/load balancer, definir para o nº de hops para o req.ip refletir o cliente real.
+  TRUST_PROXY: z.coerce.number().int().min(0).default(0),
 });
 
 const parsed = envSchema.safeParse(process.env);

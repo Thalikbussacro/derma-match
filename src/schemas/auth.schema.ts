@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const cadastroSchema = z
   .object({
     nome: z.string().min(2).max(120),
-    email: z.string().email().max(160),
+    email: z.string().trim().toLowerCase().email().max(160),
     senha: z.string().min(8).max(72),
     aceiteLgpd: z.literal(true),
   })
@@ -13,7 +13,7 @@ export type CadastroInput = z.infer<typeof cadastroSchema>;
 
 export const loginSchema = z
   .object({
-    email: z.string().email().max(160),
+    email: z.string().trim().toLowerCase().email().max(160),
     senha: z.string().min(1).max(72),
   })
   .strict();
@@ -22,7 +22,7 @@ export type LoginInput = z.infer<typeof loginSchema>;
 
 export const recuperarSenhaSchema = z
   .object({
-    email: z.string().email().max(160),
+    email: z.string().trim().toLowerCase().email().max(160),
   })
   .strict();
 

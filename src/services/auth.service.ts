@@ -15,6 +15,8 @@ const CUSTO_BCRYPT = 10;
 const MAX_TENTATIVAS_LOGIN = 5;
 const BLOQUEIO_LOGIN_MS = 15 * 60 * 1000;
 const RECUPERACAO_SENHA_MS = 60 * 60 * 1000;
+// Hash bcrypt fixo usado para igualar o tempo de resposta quando o email não existe (anti-timing).
+const HASH_DUMMY = bcrypt.hashSync('timing-attack-mitigation-dummy', CUSTO_BCRYPT);
 
 export interface LoginResultado {
   usuario: UsuarioResponse;
@@ -62,6 +64,8 @@ export const authService = {
   async cadastrar(input: CadastroInput): Promise<UsuarioResponse> {
     const existente = await usuarioRepository.buscarPorEmail(input.email);
     if (existente) {
+      // Trade-off aceito: revela que o email já existe (necessário para a UX de cadastro),
+      // ao contrário do anti-enumeração de login/recuperação. Registrado na revisão da Fase 1.
       throw new ConflictError('Email já cadastrado.');
     }
 
@@ -80,6 +84,8 @@ export const authService = {
     const usuario = await usuarioRepository.buscarPorEmail(input.email);
     // Mensagem genérica para email inexistente e senha errada (RF-AUTH-006).
     if (!usuario) {
+      // Compara contra um hash dummy para igualar o tempo do caminho "senha errada" (anti-timing).
+      await bcrypt.compare(input.senha, HASH_DUMMY);
       throw new UnauthorizedError('Credenciais inválidas.');
     }
 
@@ -113,7 +119,15 @@ export const authService = {
     }
 
     const registro = await refreshTokenRepository.buscarPorHash(hashSha256(payload.jti));
-    if (!registro || registro.revogadoEm !== null || registro.expiraEm.getTime() < Date.now()) {
+    if (!registro) {
+      throw new UnauthorizedError('Refresh token inválido ou revogado.', 'REFRESH_INVALIDO');
+    }
+    // Reuso de um refresh já revogado indica possível roubo: revoga toda a família do usuário.
+    if (registro.revogadoEm !== null) {
+      await refreshTokenRepository.revogarTodosDoUsuario(registro.usuarioId);
+      throw new UnauthorizedError('Refresh token inválido ou revogado.', 'REFRESH_INVALIDO');
+    }
+    if (registro.expiraEm.getTime() < Date.now()) {
       throw new UnauthorizedError('Refresh token inválido ou revogado.', 'REFRESH_INVALIDO');
     }
 
@@ -182,5 +196,7 @@ export const authService = {
     await usuarioRepository.atualizar(registro.usuarioId, { senhaHash });
     // Troca de senha força re-login: revoga todos os refresh tokens do usuário.
     await refreshTokenRepository.revogarTodosDoUsuario(registro.usuarioId);
+    // Redefinir a senha também libera bloqueio por tentativas (o usuário provou controle via email).
+    await usuarioRepository.limparTentativas(registro.usuarioId);
   },
 };

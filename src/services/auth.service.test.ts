@@ -37,6 +37,16 @@ describe('authService.cadastrar', () => {
     const semAceite = { nome: 'Ana', email: 'ana@example.com', senha: 'senha12345' };
     expect(cadastroSchema.safeParse(semAceite).success).toBe(false);
   });
+
+  it('o schema normaliza o email (trim + lowercase)', () => {
+    const parsed = cadastroSchema.parse({
+      nome: 'Ana',
+      email: '  Ana@Example.COM ',
+      senha: 'senha12345',
+      aceiteLgpd: true,
+    });
+    expect(parsed.email).toBe('ana@example.com');
+  });
 });
 
 describe('authService.login', () => {
@@ -86,6 +96,18 @@ describe('authService.refresh', () => {
 
     await authService.logout(login.refreshToken);
     await expect(authService.refresh(login.refreshToken)).rejects.toThrow();
+  });
+
+  it('detecta reuso de refresh revogado e revoga a família toda', async () => {
+    await authService.cadastrar(inputValido);
+    const login = await authService.login({ email: inputValido.email, senha: inputValido.senha });
+
+    // rotaciona: RT1 -> RT2 (RT1 fica revogado, RT2 ativo)
+    const rotacionado = await authService.refresh(login.refreshToken);
+
+    // reuso do RT1 (revogado) derruba também o RT2 (detecção de roubo)
+    await expect(authService.refresh(login.refreshToken)).rejects.toThrow();
+    await expect(authService.refresh(rotacionado.refreshToken)).rejects.toThrow();
   });
 });
 
