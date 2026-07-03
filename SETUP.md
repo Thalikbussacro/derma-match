@@ -45,3 +45,17 @@ Para derrubar e apagar os dados:
 ```bash
 docker compose down -v
 ```
+
+## 4. Rodar a aplicação
+
+```bash
+pnpm dev
+```
+
+Sobe o servidor em `http://localhost:3000` (porta configurável via `PORT` no `.env`).
+
+## Testar endpoints (.http)
+
+Os testes manuais de endpoint ficam na pasta `.http/` (não versionada). O cliente esperado é a
+extensão **REST Client** do VS Code: abra um arquivo `.http`, clique em _Send Request_ acima da
+requisição e veja a resposta. Exemplo pronto: `.http/health.http`.
