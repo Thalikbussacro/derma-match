@@ -9,7 +9,12 @@
     "seed": "tsx prisma/seed.ts"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["@prisma/client", "@prisma/engines", "esbuild", "prisma"]
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "prisma"
+    ]
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -19,6 +24,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
+    "test": "vitest run",
+    "test:setup": "tsx tests/setup-db.ts",
     "postinstall": "prisma generate"
   },
   "devDependencies": {
@@ -34,7 +41,8 @@
     "prisma": "^6.19.3",
     "tsx": "^4.22.5",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.62.1"
+    "typescript-eslint": "^8.62.1",
+    "vitest": "^4.1.9"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

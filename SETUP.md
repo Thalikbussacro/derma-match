@@ -59,3 +59,27 @@ Sobe o servidor em `http://localhost:3000` (porta configurável via `PORT` no `.
 Os testes manuais de endpoint ficam na pasta `.http/` (não versionada). O cliente esperado é a
 extensão **REST Client** do VS Code: abra um arquivo `.http`, clique em _Send Request_ acima da
 requisição e veja a resposta. Exemplo pronto: `.http/health.http`.
+
+## Testes automatizados
+
+Os testes usam um schema Postgres separado (`test`) no mesmo banco, isolado do schema de
+desenvolvimento (`public`).
+
+1. Crie o `.env.test` (não versionado):
+
+   ```
+   NODE_ENV=test
+   DATABASE_URL="postgresql://derma:derma@localhost:5433/derma_match?schema=test"
+   ```
+
+2. Prepare o banco de teste (aplica migrations e seed no schema `test`):
+
+   ```bash
+   pnpm test:setup
+   ```
+
+3. Rode os testes:
+
+   ```bash
+   pnpm test
+   ```
