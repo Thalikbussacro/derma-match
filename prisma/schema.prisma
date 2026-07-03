@@ -20,6 +20,7 @@ model TipoPele {
   descricao String
 
   usuariosPredominantes Usuario[]
+  pesos                 PesoOpcaoPele[]
 
   @@map("tipos_pele")
 }
@@ -40,6 +41,7 @@ model Usuario {
   tipoPelePredominante   TipoPele?               @relation(fields: [tipoPelePredominanteId], references: [id])
   refreshTokens          RefreshToken[]
   tokensRecuperacaoSenha TokenRecuperacaoSenha[]
+  respostas              RespostaUsuario[]
 
   @@map("usuarios")
 }
@@ -70,4 +72,59 @@ model TokenRecuperacaoSenha {
 
   @@index([usuarioId, usadoEm])
   @@map("tokens_recuperacao_senha")
+}
+
+model Pergunta {
+  id               Int    @id @default(autoincrement())
+  texto            String
+  ordem            Int
+  dependeDeOpcaoId Int?   @map("depende_de_opcao_id")
+
+  opcoes         OpcaoResposta[]   @relation("PerguntaOpcoes")
+  dependeDeOpcao OpcaoResposta?    @relation("OpcaoDependencia", fields: [dependeDeOpcaoId], references: [id])
+  respostas      RespostaUsuario[]
+
+  @@index([ordem])
+  @@map("perguntas")
+}
+
+model OpcaoResposta {
+  id         Int    @id @default(autoincrement())
+  perguntaId Int    @map("pergunta_id")
+  texto      String @db.VarChar(200)
+
+  pergunta             Pergunta          @relation("PerguntaOpcoes", fields: [perguntaId], references: [id], onDelete: Cascade)
+  pesos                PesoOpcaoPele[]
+  respostas            RespostaUsuario[]
+  perguntasDependentes Pergunta[]        @relation("OpcaoDependencia")
+
+  @@map("opcoes_resposta")
+}
+
+model PesoOpcaoPele {
+  opcaoId    Int @map("opcao_id")
+  tipoPeleId Int @map("tipo_pele_id")
+  peso       Int
+
+  opcao    OpcaoResposta @relation(fields: [opcaoId], references: [id], onDelete: Cascade)
+  tipoPele TipoPele      @relation(fields: [tipoPeleId], references: [id])
+
+  @@id([opcaoId, tipoPeleId])
+  @@map("pesos_opcao_pele")
+}
+
+model RespostaUsuario {
+  id           Int      @id @default(autoincrement())
+  usuarioId    Int      @map("usuario_id")
+  perguntaId   Int      @map("pergunta_id")
+  opcaoId      Int      @map("opcao_id")
+  respondidoEm DateTime @default(now()) @map("respondido_em")
+
+  usuario  Usuario       @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  pergunta Pergunta      @relation(fields: [perguntaId], references: [id], onDelete: Cascade)
+  opcao    OpcaoResposta @relation(fields: [opcaoId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, perguntaId])
+  @@index([usuarioId])
+  @@map("respostas_usuario")
 }
