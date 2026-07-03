@@ -45,6 +45,7 @@ const rotasPublicas = new Set([
   'POST /api/auth/cadastro',
   'POST /api/auth/login',
   'POST /api/auth/refresh',
+  'POST /api/auth/logout',
   'POST /api/auth/recuperar-senha',
   'POST /api/auth/redefinir-senha',
   'GET /api/health',

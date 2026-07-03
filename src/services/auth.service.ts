@@ -30,6 +30,27 @@ function hashSha256(valor: string): string {
   return createHash('sha256').update(valor).digest('hex');
 }
 
+// Gera o par de tokens e persiste só o hash do jti do refresh. Nunca grava o token cru.
+async function emitirTokens(usuario: Usuario): Promise<LoginResultado> {
+  const accessToken = tokenService.gerarAccessToken(usuario.id, usuario.plano);
+  const refreshToken = tokenService.gerarRefreshToken(usuario.id);
+  const payload = tokenService.verificarRefreshToken(refreshToken);
+  const expiraEm = new Date(payload.exp * 1000);
+
+  await refreshTokenRepository.criar({
+    usuarioId: usuario.id,
+    tokenHash: hashSha256(payload.jti),
+    expiraEm,
+  });
+
+  return {
+    usuario: paraResponse(usuario),
+    accessToken,
+    refreshToken,
+    refreshTokenExpiraEm: expiraEm,
+  };
+}
+
 export const authService = {
   async cadastrar(input: CadastroInput): Promise<UsuarioResponse> {
     const existente = await usuarioRepository.buscarPorEmail(input.email);
@@ -60,23 +81,44 @@ export const authService = {
       throw new UnauthorizedError('Credenciais inválidas.');
     }
 
-    const accessToken = tokenService.gerarAccessToken(usuario.id, usuario.plano);
-    const refreshToken = tokenService.gerarRefreshToken(usuario.id);
-    const payloadRefresh = tokenService.verificarRefreshToken(refreshToken);
+    return emitirTokens(usuario);
+  },
 
-    // Guarda só o hash do jti; o token cru nunca toca o banco.
-    const expiraEm = new Date(payloadRefresh.exp * 1000);
-    await refreshTokenRepository.criar({
-      usuarioId: usuario.id,
-      tokenHash: hashSha256(payloadRefresh.jti),
-      expiraEm,
-    });
+  async refresh(refreshToken: string): Promise<LoginResultado> {
+    let payload;
+    try {
+      payload = tokenService.verificarRefreshToken(refreshToken);
+    } catch {
+      throw new UnauthorizedError('Refresh token inválido.', 'REFRESH_INVALIDO');
+    }
 
-    return {
-      usuario: paraResponse(usuario),
-      accessToken,
-      refreshToken,
-      refreshTokenExpiraEm: expiraEm,
-    };
+    const registro = await refreshTokenRepository.buscarPorHash(hashSha256(payload.jti));
+    if (!registro || registro.revogadoEm !== null || registro.expiraEm.getTime() < Date.now()) {
+      throw new UnauthorizedError('Refresh token inválido ou revogado.', 'REFRESH_INVALIDO');
+    }
+
+    const usuario = await usuarioRepository.buscarPorId(payload.sub);
+    if (!usuario) {
+      throw new UnauthorizedError('Refresh token inválido ou revogado.', 'REFRESH_INVALIDO');
+    }
+
+    // Rotação: revoga o refresh usado antes de emitir um novo par.
+    await refreshTokenRepository.revogar(registro.id);
+    return emitirTokens(usuario);
+  },
+
+  async logout(refreshToken: string): Promise<void> {
+    let payload;
+    try {
+      payload = tokenService.verificarRefreshToken(refreshToken);
+    } catch {
+      // Token inválido: logout é idempotente, sucesso silencioso.
+      return;
+    }
+
+    const registro = await refreshTokenRepository.buscarPorHash(hashSha256(payload.jti));
+    if (registro && registro.revogadoEm === null) {
+      await refreshTokenRepository.revogar(registro.id);
+    }
   },
 };
