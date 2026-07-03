@@ -1,66 +1,15 @@
 {
-  "name": "derma-match",
+  "name": "derma-match-monorepo",
   "version": "0.1.0",
-  "description": "Plataforma web de skincare personalizado — backend.",
+  "private": true,
   "type": "module",
-  "license": "ISC",
   "packageManager": "pnpm@10.33.2",
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@prisma/client",
-      "@prisma/engines",
-      "bcrypt",
-      "esbuild",
-      "prisma"
-    ]
-  },
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc -p tsconfig.build.json",
-    "start": "node dist/index.js",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write .",
-    "test": "vitest run",
-    "test:setup": "tsx tests/setup-db.ts",
-    "postinstall": "prisma generate"
-  },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/bcrypt": "^6.0.0",
-    "@types/cookie-parser": "^1.4.10",
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.6",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^26.1.0",
-    "@types/nodemailer": "^8.0.1",
-    "eslint": "^10.6.0",
-    "eslint-config-prettier": "^10.1.8",
-    "pino-pretty": "^13.1.3",
-    "prettier": "^3.9.4",
-    "prisma": "^6.19.3",
-    "tsx": "^4.22.5",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.62.1",
-    "vitest": "^4.1.9"
-  },
-  "dependencies": {
-    "@prisma/client": "^6.19.3",
-    "bcrypt": "^6.0.0",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "express-rate-limit": "^8.5.2",
-    "helmet": "^8.2.0",
-    "jsonwebtoken": "^9.0.3",
-    "nodemailer": "^9.0.3",
-    "pino": "^10.3.1",
-    "pino-http": "^11.0.0",
-    "zod": "^3.25.76"
+    "dev:backend": "pnpm --filter derma-match dev",
+    "dev:frontend": "pnpm --filter derma-match-frontend dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm --filter derma-match test"
   }
 }

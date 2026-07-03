@@ -1,0 +1,12 @@
+packages:
+  - packages/*
+  - backend
+  - frontend
+
+# pnpm 10 bloqueia scripts de build por padrão; liberamos os nativos/necessários no workspace todo.
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - bcrypt
+  - esbuild
+  - prisma
