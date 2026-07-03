@@ -1,32 +1,33 @@
-# React + TypeScript + Vite
+# Derma Match — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Frontend do Derma Match (React + Vite + TypeScript + Tailwind). Consome a API REST do backend.
 
-Currently, two official plugins are available:
+## Rodar localmente
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. Suba o **backend** na raiz do repositório (`pnpm dev`, porta 3000). Veja `../SETUP.md`.
+2. Neste diretório (`frontend/`):
 
-## React Compiler
+   ```bash
+   pnpm install
+   cp .env.example .env
+   pnpm dev
+   ```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+3. Abra `http://localhost:5173`. Em dev, chamadas a `/api/*` são encaminhadas ao backend pelo proxy do Vite (same-site: cookies e CORS triviais).
 
-## Expanding the Oxlint configuration
+## Scripts
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+| Script                   | O que faz                                 |
+| ------------------------ | ----------------------------------------- |
+| `pnpm dev`               | Servidor de desenvolvimento (Vite).       |
+| `pnpm build`             | Type-check + build de produção (`dist/`). |
+| `pnpm preview`           | Serve o build gerado.                     |
+| `pnpm typecheck`         | Checagem de tipos.                        |
+| `pnpm lint` / `lint:fix` | ESLint.                                   |
+| `pnpm format`            | Prettier.                                 |
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+## Stack
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+React 19 · Vite · TypeScript strict · Tailwind CSS v4 · React Router 7 · TanStack Query 5 · axios · React Hook Form + Zod.
+
+O planejamento por fases está em `../.claude/roadmap-frontend.md` e `../.claude/phases/phase-f*.md`.
