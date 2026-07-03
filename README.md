@@ -2,11 +2,12 @@
 
 Plataforma web de skincare personalizado. A partir de um questionário adaptativo, o sistema
 identifica o tipo de pele predominante da usuária e entrega uma rotina de cuidados correspondente.
-Este repositório contém o **backend** (Node + Express + TypeScript, Postgres via Prisma).
+Este repositório contém o **backend** (Node + Express + TypeScript, Postgres via Prisma) na raiz e o
+**frontend** (React + Vite + Tailwind) em [`frontend/`](./frontend).
 
-**Stack:** Node 22 · TypeScript strict · Express 5 · Prisma 6 / PostgreSQL 16 · Zod · JWT + bcrypt · Vitest.
+**Stack:** Node 22 · TypeScript strict · Express 5 · Prisma 6 / PostgreSQL 16 · Zod · JWT + bcrypt · Vitest · React 19 · Tailwind CSS.
 
-**Estado:** MVP backend concluído (Fases 0–4). Frontend não iniciado. Plano Premium adiado (Fase 5).
+**Estado:** MVP concluído — backend (Fases 0–4) e frontend (Fases F0–F4). Plano Premium adiado (Fase 5).
 
 ## Pré-requisitos
 
@@ -68,6 +69,21 @@ pnpm prisma db seed
   isolado. Detalhes em [`SETUP.md`](./SETUP.md).
 - **Manuais de rota:** ficam em `.http/` (não versionada) e usam a extensão **REST Client** do VS
   Code. `.http/fluxo-completo.http` cobre a jornada ponta a ponta.
+
+## Frontend
+
+O frontend (React + Vite + TypeScript + Tailwind) fica em [`frontend/`](./frontend) e consome esta
+API. Com o backend rodando, suba-o com:
+
+```bash
+cd frontend
+pnpm install
+cp .env.example .env
+pnpm dev
+```
+
+Abre em `http://localhost:5173` e, em dev, encaminha `/api/*` para o backend pelo proxy do Vite.
+Detalhes em [`frontend/README.md`](./frontend/README.md).
 
 ## Documentação do projeto
 
