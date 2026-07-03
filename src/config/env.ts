@@ -14,6 +14,10 @@ const envSchema = z.object({
         .map((origem) => origem.trim())
         .filter(Boolean),
     ),
+  JWT_ACCESS_SECRET: z.string().min(32),
+  JWT_REFRESH_SECRET: z.string().min(32),
+  JWT_ACCESS_EXPIRATION: z.string().default('15m'),
+  JWT_REFRESH_EXPIRATION: z.string().default('7d'),
 });
 
 const parsed = envSchema.safeParse(process.env);
