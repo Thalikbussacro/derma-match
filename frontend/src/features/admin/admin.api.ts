@@ -2,12 +2,15 @@ import axios from 'axios';
 import type {
   AdminResponse,
   AtualizarPerguntaInput,
+  AtualizarTipoPeleInput,
   BiomedicaAdmin,
   CriarBiomedicaInput,
   CriarOpcaoInput,
   CriarPerguntaInput,
+  CriarTipoPeleInput,
   DefinirPesoInput,
   QuestionarioRascunho,
+  TipoPeleAdmin,
 } from '@derma-match/shared';
 import { apiAdmin } from '../../lib/apiAdmin';
 
@@ -76,5 +79,17 @@ export const adminApi = {
   },
   async definirPeso(input: DefinirPesoInput): Promise<void> {
     await apiAdmin.put('/admin/questionario/pesos', input);
+  },
+
+  // --- Tipos de pele (espectro) ---
+  async tiposPele(): Promise<TipoPeleAdmin[]> {
+    const res = await apiAdmin.get<TipoPeleAdmin[]>('/admin/tipos-pele');
+    return res.data;
+  },
+  async criarTipoPele(input: CriarTipoPeleInput): Promise<void> {
+    await apiAdmin.post('/admin/tipos-pele', input);
+  },
+  async atualizarTipoPele(id: number, input: AtualizarTipoPeleInput): Promise<void> {
+    await apiAdmin.patch(`/admin/tipos-pele/${id}`, input);
   },
 };

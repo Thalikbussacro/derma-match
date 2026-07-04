@@ -87,6 +87,11 @@ export function BiomedicaAtendimentoPage() {
                   <span className="font-bold capitalize text-neutral-800">
                     {contextoQuery.data.tipoPeleNome ?? 'não definido'}
                   </span>
+                  {contextoQuery.data.tipoPeleNivel != null && (
+                    <span className="text-neutral-500">
+                      {' · '}nível {contextoQuery.data.tipoPeleNivel}/5
+                    </span>
+                  )}
                 </p>
                 <div className="flex flex-col gap-2">
                   {contextoQuery.data.respostas.map((r) => (

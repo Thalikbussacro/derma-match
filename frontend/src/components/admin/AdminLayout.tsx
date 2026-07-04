@@ -42,6 +42,7 @@ export function AdminLayout() {
             {[
               { to: '/admin', label: 'Biomédicas', end: true },
               { to: '/admin/questionario', label: 'Questionário', end: false },
+              { to: '/admin/tipos-pele', label: 'Tipos de pele', end: false },
             ].map((item) => (
               <NavLink
                 key={item.to}

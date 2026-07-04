@@ -31,11 +31,13 @@ export const estadoQuestionarioResponseSchema = z.object({
   perguntasRespondidas: z.number(),
   totalPerguntas: z.number(),
   tipoPeleId: z.number().nullable(),
+  tipoPeleNivel: z.number().nullable(),
 });
 export type EstadoQuestionarioResponse = z.infer<typeof estadoQuestionarioResponseSchema>;
 
 export const resultadoTipoPeleSchema = z.object({
   tipoPeleId: z.number(),
   tipoPeleNome: z.string(),
+  nivel: z.number(),
 });
 export type ResultadoTipoPele = z.infer<typeof resultadoTipoPeleSchema>;

@@ -26,6 +26,7 @@ import { AdminAuthProvider } from './features/admin/AdminAuthProvider';
 import { AdminBiomedicasPage } from './pages/admin/AdminBiomedicasPage';
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
 import { AdminQuestionarioPage } from './pages/admin/AdminQuestionarioPage';
+import { AdminTiposPelePage } from './pages/admin/AdminTiposPelePage';
 
 export default function App() {
   return (
@@ -157,6 +158,14 @@ export default function App() {
             element={
               <RequireAdmin>
                 <AdminQuestionarioPage />
+              </RequireAdmin>
+            }
+          />
+          <Route
+            path="tipos-pele"
+            element={
+              <RequireAdmin>
+                <AdminTiposPelePage />
               </RequireAdmin>
             }
           />

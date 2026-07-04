@@ -52,6 +52,9 @@ export function QuestionarioPage() {
           </span>
           <p className="text-sm font-semibold text-white/80">Seu tipo de pele é</p>
           <p className="text-3xl font-extrabold capitalize">{resultado.tipoPeleNome}</p>
+          <p className="text-xs font-semibold text-white/70">
+            Nível {resultado.nivel}/5 no espectro
+          </p>
           <p className="text-sm text-white/85">
             Preparamos uma rotina de cuidados pensada para você.
           </p>

@@ -84,3 +84,30 @@ export interface QuestionarioRascunho {
   tipos: RascunhoTipoPele[];
   perguntas: RascunhoPergunta[];
 }
+
+// --- Tipos de pele (admin) ---
+
+export const criarTipoPeleSchema = z
+  .object({
+    nome: z.string().min(2).max(40),
+    descricao: z.string().min(3),
+    ordem: z.number().int().min(0),
+  })
+  .strict();
+export type CriarTipoPeleInput = z.infer<typeof criarTipoPeleSchema>;
+
+export const atualizarTipoPeleSchema = z
+  .object({
+    nome: z.string().min(2).max(40).optional(),
+    descricao: z.string().min(3).optional(),
+    ordem: z.number().int().min(0).optional(),
+  })
+  .strict();
+export type AtualizarTipoPeleInput = z.infer<typeof atualizarTipoPeleSchema>;
+
+export interface TipoPeleAdmin {
+  id: number;
+  nome: string;
+  descricao: string;
+  ordem: number;
+}

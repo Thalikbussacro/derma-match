@@ -38,3 +38,14 @@ export function useInvalidarRascunho() {
   const qc = useQueryClient();
   return () => qc.invalidateQueries({ queryKey: CHAVE_RASCUNHO });
 }
+
+const CHAVE_TIPOS = ['admin', 'tipos-pele'];
+
+export function useTiposPele() {
+  return useQuery({ queryKey: CHAVE_TIPOS, queryFn: () => adminApi.tiposPele() });
+}
+
+export function useInvalidarTipos() {
+  const qc = useQueryClient();
+  return () => qc.invalidateQueries({ queryKey: CHAVE_TIPOS });
+}

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { adminAuthController } from '../controllers/admin-auth.controller.js';
 import { adminBiomedicaController } from '../controllers/admin-biomedica.controller.js';
+import { adminTipoPeleController } from '../controllers/admin-tipo-pele.controller.js';
 import { questionarioAdminController } from '../controllers/questionario-admin.controller.js';
 import { exigirAdmin } from '../middlewares/exigir-tipo.js';
 import { loginLimiter } from '../middlewares/rate-limit.js';
@@ -43,3 +44,8 @@ adminRouter.delete(
   questionarioAdminController.removerOpcao,
 );
 adminRouter.put('/questionario/pesos', exigirAdmin, questionarioAdminController.definirPeso);
+
+// Tipos de pele (espectro).
+adminRouter.get('/tipos-pele', exigirAdmin, adminTipoPeleController.listar);
+adminRouter.post('/tipos-pele', exigirAdmin, adminTipoPeleController.criar);
+adminRouter.patch('/tipos-pele/:id', exigirAdmin, adminTipoPeleController.atualizar);

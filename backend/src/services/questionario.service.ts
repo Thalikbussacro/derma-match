@@ -50,6 +50,7 @@ async function obterEstado(usuarioId: number): Promise<EstadoQuestionarioRespons
     perguntasRespondidas,
     totalPerguntas,
     tipoPeleId: usuario.tipoPelePredominanteId,
+    tipoPeleNivel: usuario.tipoPeleNivel,
   };
 }
 
@@ -147,7 +148,27 @@ export function determinarTipoPeleVencedor(somaPorTipo: Map<number, number>): nu
   return vencedorId;
 }
 
-async function finalizar(usuarioId: number): Promise<{ tipoPeleId: number; tipoPeleNome: string }> {
+// Nível 1–5 dentro do tipo vencedor: inclinação rumo ao tipo vizinho no espectro (ADR-0016 / C3).
+// lean = clamp((S_prox − S_ant) / max(S_venc, 1), −1, 1); nível = round(3 + 2·lean).
+export function calcularNivel(
+  vencedor: { id: number; ordem: number },
+  tipos: { id: number; ordem: number }[],
+  somaPorTipo: Map<number, number>,
+): number {
+  const scoreDaOrdem = (ordem: number): number => {
+    const tipo = tipos.find((t) => t.ordem === ordem);
+    return tipo ? (somaPorTipo.get(tipo.id) ?? 0) : 0;
+  };
+  const sVenc = somaPorTipo.get(vencedor.id) ?? 0;
+  const sAnt = scoreDaOrdem(vencedor.ordem - 1);
+  const sProx = scoreDaOrdem(vencedor.ordem + 1);
+  const lean = Math.max(-1, Math.min(1, (sProx - sAnt) / Math.max(sVenc, 1)));
+  return Math.max(1, Math.min(5, Math.round(3 + 2 * lean)));
+}
+
+async function finalizar(
+  usuarioId: number,
+): Promise<{ tipoPeleId: number; tipoPeleNome: string; nivel: number }> {
   const proxima = await obterProximaPergunta(usuarioId);
   if (proxima !== null) {
     throw new ValidationError('O questionário ainda não foi concluído.', 'QUESTIONARIO_INCOMPLETO');
@@ -169,13 +190,15 @@ async function finalizar(usuarioId: number): Promise<{ tipoPeleId: number; tipoP
     );
   }
 
-  const tipoPele = await tipoPeleRepository.buscarPorId(vencedorId);
-  if (!tipoPele) {
+  const tipos = await tipoPeleRepository.listar();
+  const vencedor = tipos.find((t) => t.id === vencedorId);
+  if (!vencedor) {
     throw new NotFoundError('Tipo de pele');
   }
+  const nivel = calcularNivel(vencedor, tipos, somaPorTipo);
 
-  await usuarioRepository.atualizarTipoPelePredominante(usuarioId, vencedorId);
-  return { tipoPeleId: tipoPele.id, tipoPeleNome: tipoPele.nome };
+  await usuarioRepository.atualizarResultado(usuarioId, vencedorId, nivel);
+  return { tipoPeleId: vencedor.id, tipoPeleNome: vencedor.nome, nivel };
 }
 
 export const questionarioService = {

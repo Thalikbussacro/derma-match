@@ -39,6 +39,7 @@ export type ConversaBiomedicaResponse = z.infer<typeof conversaBiomedicaResponse
 export const contextoClinicoResponseSchema = z.object({
   usuarioNome: z.string(),
   tipoPeleNome: z.string().nullable(),
+  tipoPeleNivel: z.number().nullable(),
   respostas: z.array(z.object({ pergunta: z.string(), resposta: z.string() })),
 });
 export type ContextoClinicoResponse = z.infer<typeof contextoClinicoResponseSchema>;

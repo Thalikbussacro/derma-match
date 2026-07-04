@@ -252,12 +252,21 @@ const rotinas: RotinaDef[] = [
   },
 ];
 
+// Posição no espectro (do mais seco ao mais oleoso; sensível ao fim). Ajustável no admin (C3).
+const ordemPorTipo: Record<TipoNome, number> = {
+  seca: 1,
+  normal: 2,
+  mista: 3,
+  oleosa: 4,
+  sensivel: 5,
+};
+
 async function seedTiposPele(): Promise<Map<TipoNome, number>> {
   for (const tipo of tiposPele) {
     await prisma.tipoPele.upsert({
       where: { nome: tipo.nome },
-      update: { descricao: tipo.descricao },
-      create: tipo,
+      update: { descricao: tipo.descricao, ordem: ordemPorTipo[tipo.nome] },
+      create: { ...tipo, ordem: ordemPorTipo[tipo.nome] },
     });
   }
   const registros = await prisma.tipoPele.findMany();
@@ -274,6 +283,11 @@ async function seedQuestionario(tiposPeleIds: Map<TipoNome, number>): Promise<vo
     where: { numero: 1 },
     update: { status: 'PUBLICADO' },
     create: { numero: 1, status: 'PUBLICADO', publicadoEm: new Date() },
+  });
+  // Reset: a v1 é a única publicada (seed é ferramenta de dev/reset). Arquiva as demais.
+  await prisma.questionarioVersao.updateMany({
+    where: { numero: { not: 1 } },
+    data: { status: 'ARQUIVADO' },
   });
   // Apagar e recriar (aceitável em seed). O cascade remove opções, pesos e respostas.
   await prisma.pergunta.deleteMany();

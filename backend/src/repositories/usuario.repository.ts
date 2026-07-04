@@ -34,6 +34,17 @@ export const usuarioRepository = {
     });
   },
 
+  atualizarResultado(
+    id: number,
+    tipoPelePredominanteId: number,
+    tipoPeleNivel: number | null,
+  ): Promise<Usuario> {
+    return prisma.usuario.update({
+      where: { id },
+      data: { tipoPelePredominanteId, tipoPeleNivel },
+    });
+  },
+
   incrementarTentativasFalhas(id: number): Promise<Usuario> {
     return prisma.usuario.update({
       where: { id },

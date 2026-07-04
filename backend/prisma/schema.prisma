@@ -18,6 +18,7 @@ model TipoPele {
   id        Int    @id @default(autoincrement())
   nome      String @unique @db.VarChar(40)
   descricao String
+  ordem     Int    @default(0) // posição no espectro (C3); usada para calcular o nível 1–5
 
   usuariosPredominantes Usuario[]
   pesos                 PesoOpcaoPele[]
@@ -33,6 +34,7 @@ model Usuario {
   senhaHash                     String    @map("senha_hash") @db.VarChar(255)
   plano                         Plano     @default(FREE)
   tipoPelePredominanteId        Int?      @map("tipo_pele_predominante_id")
+  tipoPeleNivel                 Int?      @map("tipo_pele_nivel")
   questionarioVersaoId          Int?      @map("questionario_versao_id")
   consentimentoLgpdEm           DateTime  @map("consentimento_lgpd_em")
   consentimentoVersao           String    @default("1.0") @map("consentimento_versao") @db.VarChar(20)

@@ -72,6 +72,7 @@ export const biomedicaConversaService = {
     return {
       usuarioNome: usuario.nome,
       tipoPeleNome: tipoPele?.nome ?? null,
+      tipoPeleNivel: usuario.tipoPeleNivel,
       respostas: respostas.map((r) => ({ pergunta: r.pergunta.texto, resposta: r.opcao.texto })),
     };
   },
