@@ -361,18 +361,34 @@ async function seedBiomedica(): Promise<void> {
   });
 }
 
+// Um admin único (ADR-0016) — gerencia biomédicas, questionário, tipos de pele e produtos.
+async function seedAdmin(): Promise<void> {
+  const senhaHash = await bcrypt.hash('admin123', 10);
+  await prisma.admin.upsert({
+    where: { email: 'admin@dermamatch.com' },
+    update: {},
+    create: {
+      nome: 'Administrador',
+      email: 'admin@dermamatch.com',
+      senhaHash,
+      ativa: true,
+    },
+  });
+}
+
 async function main(): Promise<void> {
   const tiposPeleIds = await seedTiposPele();
   await seedQuestionario(tiposPeleIds);
   await seedRotinas(tiposPeleIds);
   await seedBiomedica();
+  await seedAdmin();
 }
 
 try {
   await main();
   console.log(
     `seed concluído: ${tiposPele.length} tipos de pele, ${perguntas.length} perguntas, ` +
-      `${rotinas.length} rotinas, 1 biomédica.`,
+      `${rotinas.length} rotinas, 1 biomédica, 1 admin.`,
   );
 } catch (err) {
   console.error('falha no seed:', err);

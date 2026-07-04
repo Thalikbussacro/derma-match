@@ -54,6 +54,7 @@ model RefreshToken {
   id          Int       @id @default(autoincrement())
   usuarioId   Int?      @map("usuario_id")
   biomedicaId Int?      @map("biomedica_id")
+  adminId     Int?      @map("admin_id")
   tokenHash   String    @unique @map("token_hash") @db.VarChar(255)
   expiraEm    DateTime  @map("expira_em")
   revogadoEm  DateTime? @map("revogado_em")
@@ -61,10 +62,12 @@ model RefreshToken {
 
   usuario   Usuario?   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   biomedica Biomedica? @relation(fields: [biomedicaId], references: [id], onDelete: Cascade)
+  admin     Admin?     @relation(fields: [adminId], references: [id], onDelete: Cascade)
 
-  // XOR (exatamente um dono: usuária ou biomédica) garantido por check constraint na migração.
+  // Exatamente um dono (usuária XOR biomédica XOR admin) garantido por check constraint na migração.
   @@index([usuarioId, revogadoEm])
   @@index([biomedicaId, revogadoEm])
+  @@index([adminId, revogadoEm])
   @@map("refresh_tokens")
 }
 
@@ -186,6 +189,20 @@ model Biomedica {
   conversas     Conversa[]
 
   @@map("biomedicas")
+}
+
+model Admin {
+  id           Int      @id @default(autoincrement())
+  nome         String   @db.VarChar(120)
+  email        String   @unique @db.VarChar(160)
+  senhaHash    String   @map("senha_hash") @db.VarChar(255)
+  ativa        Boolean  @default(true)
+  criadoEm     DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  refreshTokens RefreshToken[]
+
+  @@map("admins")
 }
 
 model Conversa {
