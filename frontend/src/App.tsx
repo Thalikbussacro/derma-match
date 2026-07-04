@@ -20,6 +20,11 @@ import { BiomedicaAuthProvider } from './features/biomedica/BiomedicaAuthProvide
 import { BiomedicaAtendimentoPage } from './pages/biomedica/BiomedicaAtendimentoPage';
 import { BiomedicaDashboardPage } from './pages/biomedica/BiomedicaDashboardPage';
 import { BiomedicaLoginPage } from './pages/biomedica/BiomedicaLoginPage';
+import { AdminLayout } from './components/admin/AdminLayout';
+import { RequireAdmin } from './components/admin/RequireAdmin';
+import { AdminAuthProvider } from './features/admin/AdminAuthProvider';
+import { AdminBiomedicasPage } from './pages/admin/AdminBiomedicasPage';
+import { AdminLoginPage } from './pages/admin/AdminLoginPage';
 
 export default function App() {
   return (
@@ -124,6 +129,26 @@ export default function App() {
               <RequireBiomedica>
                 <BiomedicaAtendimentoPage />
               </RequireBiomedica>
+            }
+          />
+        </Route>
+
+        {/* Área do admin: layout e autenticação próprios (ADR-0016). */}
+        <Route
+          path="/admin"
+          element={
+            <AdminAuthProvider>
+              <AdminLayout />
+            </AdminAuthProvider>
+          }
+        >
+          <Route path="login" element={<AdminLoginPage />} />
+          <Route
+            index
+            element={
+              <RequireAdmin>
+                <AdminBiomedicasPage />
+              </RequireAdmin>
             }
           />
         </Route>
