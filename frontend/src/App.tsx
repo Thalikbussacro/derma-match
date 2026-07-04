@@ -20,6 +20,7 @@ import { BiomedicaAuthProvider } from './features/biomedica/BiomedicaAuthProvide
 import { BiomedicaAtendimentoPage } from './pages/biomedica/BiomedicaAtendimentoPage';
 import { BiomedicaDashboardPage } from './pages/biomedica/BiomedicaDashboardPage';
 import { BiomedicaLoginPage } from './pages/biomedica/BiomedicaLoginPage';
+import { BiomedicaRotinaPage } from './pages/biomedica/BiomedicaRotinaPage';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { RequireAdmin } from './components/admin/RequireAdmin';
 import { AdminAuthProvider } from './features/admin/AdminAuthProvider';
@@ -132,6 +133,14 @@ export default function App() {
             element={
               <RequireBiomedica>
                 <BiomedicaAtendimentoPage />
+              </RequireBiomedica>
+            }
+          />
+          <Route
+            path="atendimento/:id/rotina"
+            element={
+              <RequireBiomedica>
+                <BiomedicaRotinaPage />
               </RequireBiomedica>
             }
           />

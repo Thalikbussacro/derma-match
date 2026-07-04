@@ -38,3 +38,10 @@ export function useResponderBiomedica(conversaId: number) {
     },
   });
 }
+
+export function useRotinaEdicao(conversaId: number) {
+  return useQuery({
+    queryKey: ['biomedica', 'rotina', conversaId],
+    queryFn: () => biomedicaApi.rotina(conversaId),
+  });
+}

@@ -1,2 +1,7 @@
-export { itemRotinaResponseSchema, rotinaResponseSchema } from '@derma-match/shared';
-export type { ItemRotinaResponse, RotinaResponse } from '@derma-match/shared';
+export { itemRotinaResponseSchema, rotinaResponseSchema, salvarRotinaSchema } from '@derma-match/shared';
+export type {
+  ItemRotinaResponse,
+  RotinaEdicaoResponse,
+  RotinaResponse,
+  SalvarRotinaInput,
+} from '@derma-match/shared';

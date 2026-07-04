@@ -61,15 +61,25 @@ export function BiomedicaAtendimentoPage() {
         <Avatar nome={nomePaciente} tom="accent" className="h-10 w-10 text-sm" />
         <div className="min-w-0 flex-1">
           <h1 className="truncate font-extrabold text-neutral-800">{nomePaciente}</h1>
-          <button
-            type="button"
-            onClick={() => setVerContexto((v) => !v)}
-            aria-expanded={verContexto}
-            aria-controls="painel-contexto"
-            className="text-xs font-bold text-brand-600"
-          >
-            {verContexto ? 'Ocultar ficha clínica' : 'Ver ficha clínica'}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setVerContexto((v) => !v)}
+              aria-expanded={verContexto}
+              aria-controls="painel-contexto"
+              className="text-xs font-bold text-brand-600"
+            >
+              {verContexto ? 'Ocultar ficha' : 'Ver ficha'}
+            </button>
+            <span className="text-neutral-300">·</span>
+            <button
+              type="button"
+              onClick={() => void navigate(`/biomedica/atendimento/${conversaId}/rotina`)}
+              className="text-xs font-bold text-brand-600"
+            >
+              Editar rotina
+            </button>
+          </div>
         </div>
       </div>
 

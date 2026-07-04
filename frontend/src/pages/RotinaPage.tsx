@@ -7,6 +7,7 @@ import { Spinner } from '../components/ui/Spinner';
 import { IconClipboard, IconDroplet } from '../components/ui/icons';
 import { ETAPA_LABEL } from '../features/rotina/rotina.api';
 import { useRotina } from '../features/rotina/useRotina';
+import { formatarData } from '../lib/datas';
 import { codigoDeErro, mensagemDeErro } from '../lib/erros';
 
 export function RotinaPage() {
@@ -59,6 +60,11 @@ export function RotinaPage() {
           </div>
         </div>
         <p className="mt-3 text-sm text-white/85">{rotina.descricao}</p>
+        {rotina.personalizadaEm && (
+          <p className="mt-3 inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs font-bold">
+            ✨ Atualizada pela sua biomédica em {formatarData(rotina.personalizadaEm)}
+          </p>
+        )}
       </Card>
 
       <div>

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { biomedicaAuthController } from '../controllers/biomedica-auth.controller.js';
 import { biomedicaConversaController } from '../controllers/biomedica-conversa.controller.js';
+import { biomedicaRotinaController } from '../controllers/biomedica-rotina.controller.js';
 import { exigirBiomedica } from '../middlewares/exigir-tipo.js';
 import { loginLimiter, mensagemLimiter } from '../middlewares/rate-limit.js';
 
@@ -29,3 +30,7 @@ biomedicaRouter.get(
   exigirBiomedica,
   biomedicaConversaController.contexto,
 );
+
+// Rotina personalizada da paciente.
+biomedicaRouter.get('/conversas/:id/rotina', exigirBiomedica, biomedicaRotinaController.obter);
+biomedicaRouter.put('/conversas/:id/rotina', exigirBiomedica, biomedicaRotinaController.salvar);

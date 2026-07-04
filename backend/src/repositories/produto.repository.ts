@@ -35,8 +35,13 @@ export const produtoRepository = {
     await prisma.opcaoProdutoSugerido.deleteMany({ where: { opcaoId, produtoId } });
   },
 
-  // Produtos ativos sugeridos por uma opção (usado na sugestão inicial de rotina — C6).
-  listarSugeridosDaOpcao(opcaoId: number): Promise<Produto[]> {
-    return prisma.produto.findMany({ where: { ativo: true, sugestoes: { some: { opcaoId } } } });
+  // Produtos ativos sugeridos por qualquer uma das opções escolhidas (sugestão inicial — C6).
+  listarSugeridosDasOpcoes(opcaoIds: number[]): Promise<Produto[]> {
+    if (opcaoIds.length === 0) {
+      return Promise.resolve([]);
+    }
+    return prisma.produto.findMany({
+      where: { ativo: true, sugestoes: { some: { opcaoId: { in: opcaoIds } } } },
+    });
   },
 };

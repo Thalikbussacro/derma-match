@@ -4,6 +4,8 @@ import type {
   ContextoClinicoResponse,
   ConversaBiomedicaResponse,
   MensagemResponse,
+  RotinaEdicaoResponse,
+  SalvarRotinaInput,
 } from '@derma-match/shared';
 import { apiBiomedica } from '../../lib/apiBiomedica';
 
@@ -56,5 +58,16 @@ export const biomedicaApi = {
       `/biomedica/conversas/${conversaId}/contexto`,
     );
     return res.data;
+  },
+
+  async rotina(conversaId: number): Promise<RotinaEdicaoResponse> {
+    const res = await apiBiomedica.get<RotinaEdicaoResponse>(
+      `/biomedica/conversas/${conversaId}/rotina`,
+    );
+    return res.data;
+  },
+
+  async salvarRotina(conversaId: number, input: SalvarRotinaInput): Promise<void> {
+    await apiBiomedica.put(`/biomedica/conversas/${conversaId}/rotina`, input);
   },
 };

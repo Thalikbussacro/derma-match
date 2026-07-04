@@ -50,6 +50,7 @@ model Usuario {
   tokensRecuperacaoSenha TokenRecuperacaoSenha[]
   respostas              RespostaUsuario[]
   conversas              Conversa[]
+  rotinaPersonalizada    RotinaPersonalizada?
 
   @@map("usuarios")
 }
@@ -149,9 +150,56 @@ model Produto {
   ativo     Boolean     @default(true)
   criadoEm  DateTime    @default(now()) @map("criado_em")
 
-  sugestoes OpcaoProdutoSugerido[]
+  sugestoes   OpcaoProdutoSugerido[]
+  itensRotina ItemRotinaPersonalizada[]
 
   @@map("produtos")
+}
+
+// Rotina personalizada por paciente (override da rotina base do tipo — ADR-0016 / C6).
+model RotinaPersonalizada {
+  id           Int      @id @default(autoincrement())
+  usuarioId    Int      @unique @map("usuario_id")
+  biomedicaId  Int      @map("biomedica_id")
+  criadoEm     DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  usuario    Usuario                   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  biomedica  Biomedica                 @relation(fields: [biomedicaId], references: [id])
+  itens      ItemRotinaPersonalizada[]
+  alteracoes RotinaAlteracao[]
+
+  @@map("rotinas_personalizadas")
+}
+
+model ItemRotinaPersonalizada {
+  id                    Int         @id @default(autoincrement())
+  rotinaPersonalizadaId Int         @map("rotina_personalizada_id")
+  etapa                 EtapaRotina
+  descricao             String
+  ordem                 Int
+  produtoId             Int?        @map("produto_id")
+
+  rotina  RotinaPersonalizada @relation(fields: [rotinaPersonalizadaId], references: [id], onDelete: Cascade)
+  produto Produto?            @relation(fields: [produtoId], references: [id])
+
+  @@index([rotinaPersonalizadaId, ordem])
+  @@map("itens_rotina_personalizada")
+}
+
+// Trilha clínica: quem alterou a rotina da paciente e quando.
+model RotinaAlteracao {
+  id                    Int      @id @default(autoincrement())
+  rotinaPersonalizadaId Int      @map("rotina_personalizada_id")
+  biomedicaId           Int      @map("biomedica_id")
+  resumo                String
+  alteradoEm            DateTime @default(now()) @map("alterado_em")
+
+  rotina    RotinaPersonalizada @relation(fields: [rotinaPersonalizadaId], references: [id], onDelete: Cascade)
+  biomedica Biomedica           @relation(fields: [biomedicaId], references: [id])
+
+  @@index([rotinaPersonalizadaId, alteradoEm])
+  @@map("rotina_alteracoes")
 }
 
 // Produtos sugeridos por uma opção de resposta (ponto de partida da rotina — C4/C6).
@@ -238,8 +286,10 @@ model Biomedica {
   criadoEm     DateTime @default(now()) @map("criado_em")
   atualizadoEm DateTime @updatedAt @map("atualizado_em")
 
-  refreshTokens RefreshToken[]
-  conversas     Conversa[]
+  refreshTokens         RefreshToken[]
+  conversas             Conversa[]
+  rotinasPersonalizadas RotinaPersonalizada[]
+  alteracoesRotina      RotinaAlteracao[]
 
   @@map("biomedicas")
 }
