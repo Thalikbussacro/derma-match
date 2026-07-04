@@ -370,6 +370,26 @@ async function seedRotinas(tiposPeleIds: Map<TipoNome, number>): Promise<void> {
   }
 }
 
+// Catálogo de produtos de exemplo (C4). Conteúdo ilustrativo, não é indicação real.
+const produtos: { nome: string; marca: string; etapa: EtapaRotina; descricao: string }[] = [
+  { nome: 'Gel de limpeza com ácido salicílico', marca: 'Linha Controle', etapa: 'LIMPEZA', descricao: 'Limpeza para pele oleosa e acneica.' },
+  { nome: 'Loção de limpeza suave', marca: 'Linha Calm', etapa: 'LIMPEZA', descricao: 'Limpeza sem sabão para pele seca ou sensível.' },
+  { nome: 'Tônico adstringente sem álcool', marca: 'Linha Controle', etapa: 'TONIFICACAO', descricao: 'Equilíbrio da zona T sem ressecar.' },
+  { nome: 'Sérum de niacinamida', marca: 'Linha Ativa', etapa: 'TRATAMENTO', descricao: 'Controle de oleosidade e uniformização.' },
+  { nome: 'Sérum de ácido hialurônico', marca: 'Linha Hidra', etapa: 'TRATAMENTO', descricao: 'Hidratação profunda antes do hidratante.' },
+  { nome: 'Hidratante oil-free em gel', marca: 'Linha Controle', etapa: 'HIDRATACAO', descricao: 'Hidratação leve para pele oleosa.' },
+  { nome: 'Hidratante com ceramidas', marca: 'Linha Hidra', etapa: 'HIDRATACAO', descricao: 'Reforço da barreira para pele seca.' },
+  { nome: 'Protetor solar toque seco FPS 50', marca: 'Linha Sol', etapa: 'PROTECAO_SOLAR', descricao: 'Proteção sem oleosidade, para o dia a dia.' },
+];
+
+async function seedProdutos(): Promise<void> {
+  // Idempotente: recria (aceitável em seed). Cascade remove as sugestões associadas.
+  await prisma.produto.deleteMany();
+  for (const p of produtos) {
+    await prisma.produto.create({ data: p });
+  }
+}
+
 // Uma biomédica única (ADR-0011): novas usuárias Premium são associadas a ela.
 async function seedBiomedica(): Promise<void> {
   const senhaHash = await bcrypt.hash('biomedica123', 10);
@@ -405,6 +425,7 @@ async function main(): Promise<void> {
   const tiposPeleIds = await seedTiposPele();
   await seedQuestionario(tiposPeleIds);
   await seedRotinas(tiposPeleIds);
+  await seedProdutos();
   await seedBiomedica();
   await seedAdmin();
 }
@@ -413,7 +434,7 @@ try {
   await main();
   console.log(
     `seed concluído: ${tiposPele.length} tipos de pele, ${perguntas.length} perguntas, ` +
-      `${rotinas.length} rotinas, 1 biomédica, 1 admin.`,
+      `${rotinas.length} rotinas, ${produtos.length} produtos, 1 biomédica, 1 admin.`,
   );
 } catch (err) {
   console.error('falha no seed:', err);

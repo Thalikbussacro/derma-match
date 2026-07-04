@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ETAPAS, type Etapa } from './rotina.js';
 
 export const criarBiomedicaSchema = z
   .object({
@@ -70,6 +71,7 @@ export interface RascunhoOpcao {
   id: number;
   texto: string;
   pesos: RascunhoPeso[];
+  produtosSugeridos: number[];
 }
 export interface RascunhoPergunta {
   id: number;
@@ -111,3 +113,40 @@ export interface TipoPeleAdmin {
   descricao: string;
   ordem: number;
 }
+
+// --- Catálogo de produtos (admin) ---
+
+export const criarProdutoSchema = z
+  .object({
+    nome: z.string().min(2).max(120),
+    marca: z.string().max(80).nullable().optional(),
+    etapa: z.enum(ETAPAS),
+    descricao: z.string().min(3),
+  })
+  .strict();
+export type CriarProdutoInput = z.infer<typeof criarProdutoSchema>;
+
+export const atualizarProdutoSchema = z
+  .object({
+    nome: z.string().min(2).max(120).optional(),
+    marca: z.string().max(80).nullable().optional(),
+    etapa: z.enum(ETAPAS).optional(),
+    descricao: z.string().min(3).optional(),
+    ativo: z.boolean().optional(),
+  })
+  .strict();
+export type AtualizarProdutoInput = z.infer<typeof atualizarProdutoSchema>;
+
+export interface ProdutoAdmin {
+  id: number;
+  nome: string;
+  marca: string | null;
+  etapa: Etapa;
+  descricao: string;
+  ativo: boolean;
+}
+
+export const associarProdutoSchema = z
+  .object({ opcaoId: z.number().int(), produtoId: z.number().int() })
+  .strict();
+export type AssociarProdutoInput = z.infer<typeof associarProdutoSchema>;

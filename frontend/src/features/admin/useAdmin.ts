@@ -49,3 +49,14 @@ export function useInvalidarTipos() {
   const qc = useQueryClient();
   return () => qc.invalidateQueries({ queryKey: CHAVE_TIPOS });
 }
+
+const CHAVE_PRODUTOS = ['admin', 'produtos'];
+
+export function useProdutos() {
+  return useQuery({ queryKey: CHAVE_PRODUTOS, queryFn: () => adminApi.produtos() });
+}
+
+export function useInvalidarProdutos() {
+  const qc = useQueryClient();
+  return () => qc.invalidateQueries({ queryKey: CHAVE_PRODUTOS });
+}

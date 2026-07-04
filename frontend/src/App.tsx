@@ -27,6 +27,7 @@ import { AdminBiomedicasPage } from './pages/admin/AdminBiomedicasPage';
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
 import { AdminQuestionarioPage } from './pages/admin/AdminQuestionarioPage';
 import { AdminTiposPelePage } from './pages/admin/AdminTiposPelePage';
+import { AdminProdutosPage } from './pages/admin/AdminProdutosPage';
 
 export default function App() {
   return (
@@ -166,6 +167,14 @@ export default function App() {
             element={
               <RequireAdmin>
                 <AdminTiposPelePage />
+              </RequireAdmin>
+            }
+          />
+          <Route
+            path="produtos"
+            element={
+              <RequireAdmin>
+                <AdminProdutosPage />
               </RequireAdmin>
             }
           />

@@ -131,12 +131,39 @@ model OpcaoResposta {
   perguntaId Int    @map("pergunta_id")
   texto      String @db.VarChar(200)
 
-  pergunta             Pergunta          @relation("PerguntaOpcoes", fields: [perguntaId], references: [id], onDelete: Cascade)
+  pergunta             Pergunta               @relation("PerguntaOpcoes", fields: [perguntaId], references: [id], onDelete: Cascade)
   pesos                PesoOpcaoPele[]
   respostas            RespostaUsuario[]
-  perguntasDependentes Pergunta[]        @relation("OpcaoDependencia")
+  perguntasDependentes Pergunta[]             @relation("OpcaoDependencia")
+  produtosSugeridos    OpcaoProdutoSugerido[]
 
   @@map("opcoes_resposta")
+}
+
+model Produto {
+  id        Int         @id @default(autoincrement())
+  nome      String      @db.VarChar(120)
+  marca     String?     @db.VarChar(80)
+  etapa     EtapaRotina
+  descricao String
+  ativo     Boolean     @default(true)
+  criadoEm  DateTime    @default(now()) @map("criado_em")
+
+  sugestoes OpcaoProdutoSugerido[]
+
+  @@map("produtos")
+}
+
+// Produtos sugeridos por uma opção de resposta (ponto de partida da rotina — C4/C6).
+model OpcaoProdutoSugerido {
+  opcaoId   Int @map("opcao_id")
+  produtoId Int @map("produto_id")
+
+  opcao   OpcaoResposta @relation(fields: [opcaoId], references: [id], onDelete: Cascade)
+  produto Produto       @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+
+  @@id([opcaoId, produtoId])
+  @@map("opcao_produto_sugerido")
 }
 
 model PesoOpcaoPele {

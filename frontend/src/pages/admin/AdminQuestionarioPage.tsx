@@ -1,11 +1,16 @@
 import { useState } from 'react';
-import type { RascunhoOpcao, RascunhoPergunta, RascunhoTipoPele } from '@derma-match/shared';
+import type {
+  ProdutoAdmin,
+  RascunhoOpcao,
+  RascunhoPergunta,
+  RascunhoTipoPele,
+} from '@derma-match/shared';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { Spinner } from '../../components/ui/Spinner';
 import { adminApi } from '../../features/admin/admin.api';
-import { useInvalidarRascunho, useRascunho } from '../../features/admin/useAdmin';
+import { useInvalidarRascunho, useProdutos, useRascunho } from '../../features/admin/useAdmin';
 import { mensagemDeErro } from '../../lib/erros';
 
 // Executa uma ação, revalida o rascunho e devolve true em sucesso.
@@ -50,14 +55,26 @@ function PesoInput({
 function OpcaoEditor({
   opcao,
   tipos,
+  produtos,
   executar,
 }: {
   opcao: RascunhoOpcao;
   tipos: RascunhoTipoPele[];
+  produtos: ProdutoAdmin[];
   executar: Executar;
 }) {
   const [texto, setTexto] = useState(opcao.texto);
   const pesoDe = (tipoId: number) => opcao.pesos.find((p) => p.tipoPeleId === tipoId)?.peso ?? 0;
+  const sugerido = (produtoId: number) => opcao.produtosSugeridos.includes(produtoId);
+
+  function toggleProduto(produtoId: number) {
+    void executar(() =>
+      sugerido(produtoId)
+        ? adminApi.desassociarProduto({ opcaoId: opcao.id, produtoId })
+        : adminApi.associarProduto({ opcaoId: opcao.id, produtoId }),
+    );
+  }
+
   return (
     <div className="rounded-xl border border-neutral-100 bg-neutral-50 p-3">
       <div className="flex items-center gap-2">
@@ -91,6 +108,22 @@ function OpcaoEditor({
           />
         ))}
       </div>
+      {produtos.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+          <span className="text-xs font-bold text-neutral-400">Produtos sugeridos:</span>
+          {produtos.map((p) => (
+            <label key={p.id} className="flex items-center gap-1 text-xs text-neutral-600">
+              <input
+                type="checkbox"
+                checked={sugerido(p.id)}
+                onChange={() => toggleProduto(p.id)}
+                className="h-3.5 w-3.5 accent-brand-600"
+              />
+              {p.nome}
+            </label>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -98,10 +131,12 @@ function OpcaoEditor({
 function PerguntaEditor({
   pergunta,
   tipos,
+  produtos,
   executar,
 }: {
   pergunta: RascunhoPergunta;
   tipos: RascunhoTipoPele[];
+  produtos: ProdutoAdmin[];
   executar: Executar;
 }) {
   const [texto, setTexto] = useState(pergunta.texto);
@@ -154,7 +189,7 @@ function PerguntaEditor({
       </div>
       <div className="flex flex-col gap-2">
         {pergunta.opcoes.map((o) => (
-          <OpcaoEditor key={o.id} opcao={o} tipos={tipos} executar={executar} />
+          <OpcaoEditor key={o.id} opcao={o} tipos={tipos} produtos={produtos} executar={executar} />
         ))}
       </div>
       <div className="flex gap-2">
@@ -172,6 +207,7 @@ function PerguntaEditor({
 
 export function AdminQuestionarioPage() {
   const { data: rascunho, isLoading, isError } = useRascunho();
+  const { data: produtos } = useProdutos();
   const invalidar = useInvalidarRascunho();
   const [erro, setErro] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
@@ -273,7 +309,13 @@ export function AdminQuestionarioPage() {
       </Card>
 
       {rascunho.perguntas.map((p) => (
-        <PerguntaEditor key={p.id} pergunta={p} tipos={rascunho.tipos} executar={executar} />
+        <PerguntaEditor
+          key={p.id}
+          pergunta={p}
+          tipos={rascunho.tipos}
+          produtos={produtos ?? []}
+          executar={executar}
+        />
       ))}
     </div>
   );

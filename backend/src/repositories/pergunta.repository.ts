@@ -15,12 +15,12 @@ export const perguntaRepository = {
     return prisma.pergunta.count({ where: { questionarioVersaoId: versaoId } });
   },
 
-  // Edição/clonagem no admin: perguntas com opções e pesos.
+  // Edição/clonagem no admin: perguntas com opções, pesos e produtos sugeridos.
   listarCompletas(versaoId: number) {
     return prisma.pergunta.findMany({
       where: { questionarioVersaoId: versaoId },
       orderBy: { ordem: 'asc' },
-      include: { opcoes: { include: { pesos: true } } },
+      include: { opcoes: { include: { pesos: true, produtosSugeridos: true } } },
     });
   },
 

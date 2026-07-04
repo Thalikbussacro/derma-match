@@ -1,14 +1,18 @@
 import axios from 'axios';
 import type {
   AdminResponse,
+  AssociarProdutoInput,
   AtualizarPerguntaInput,
+  AtualizarProdutoInput,
   AtualizarTipoPeleInput,
   BiomedicaAdmin,
   CriarBiomedicaInput,
   CriarOpcaoInput,
   CriarPerguntaInput,
+  CriarProdutoInput,
   CriarTipoPeleInput,
   DefinirPesoInput,
+  ProdutoAdmin,
   QuestionarioRascunho,
   TipoPeleAdmin,
 } from '@derma-match/shared';
@@ -91,5 +95,23 @@ export const adminApi = {
   },
   async atualizarTipoPele(id: number, input: AtualizarTipoPeleInput): Promise<void> {
     await apiAdmin.patch(`/admin/tipos-pele/${id}`, input);
+  },
+
+  // --- Catálogo de produtos ---
+  async produtos(): Promise<ProdutoAdmin[]> {
+    const res = await apiAdmin.get<ProdutoAdmin[]>('/admin/produtos');
+    return res.data;
+  },
+  async criarProduto(input: CriarProdutoInput): Promise<void> {
+    await apiAdmin.post('/admin/produtos', input);
+  },
+  async atualizarProduto(id: number, input: AtualizarProdutoInput): Promise<void> {
+    await apiAdmin.patch(`/admin/produtos/${id}`, input);
+  },
+  async associarProduto(input: AssociarProdutoInput): Promise<void> {
+    await apiAdmin.post('/admin/produtos/associar', input);
+  },
+  async desassociarProduto(input: AssociarProdutoInput): Promise<void> {
+    await apiAdmin.post('/admin/produtos/desassociar', input);
   },
 };

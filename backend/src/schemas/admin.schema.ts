@@ -1,24 +1,31 @@
 // Fonte única em @derma-match/shared (contrato compartilhado com o frontend).
 export {
+  associarProdutoSchema,
   atualizarOpcaoSchema,
   atualizarPerguntaSchema,
+  atualizarProdutoSchema,
   atualizarTipoPeleSchema,
   criarBiomedicaSchema,
   criarOpcaoSchema,
   criarPerguntaSchema,
+  criarProdutoSchema,
   criarTipoPeleSchema,
   definirPesoSchema,
 } from '@derma-match/shared';
 export type {
+  AssociarProdutoInput,
   AtualizarOpcaoInput,
   AtualizarPerguntaInput,
+  AtualizarProdutoInput,
   AtualizarTipoPeleInput,
   BiomedicaAdmin,
   CriarBiomedicaInput,
   CriarOpcaoInput,
   CriarPerguntaInput,
+  CriarProdutoInput,
   CriarTipoPeleInput,
   DefinirPesoInput,
+  ProdutoAdmin,
   QuestionarioRascunho,
   TipoPeleAdmin,
 } from '@derma-match/shared';

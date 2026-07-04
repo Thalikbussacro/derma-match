@@ -109,6 +109,7 @@ export const questionarioAdminService = {
           id: o.id,
           texto: o.texto,
           pesos: o.pesos.map((peso) => ({ tipoPeleId: peso.tipoPeleId, peso: peso.peso })),
+          produtosSugeridos: o.produtosSugeridos.map((s) => s.produtoId),
         })),
       })),
     };

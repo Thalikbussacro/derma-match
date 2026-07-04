@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { adminAuthController } from '../controllers/admin-auth.controller.js';
 import { adminBiomedicaController } from '../controllers/admin-biomedica.controller.js';
+import { adminProdutoController } from '../controllers/admin-produto.controller.js';
 import { adminTipoPeleController } from '../controllers/admin-tipo-pele.controller.js';
 import { questionarioAdminController } from '../controllers/questionario-admin.controller.js';
 import { exigirAdmin } from '../middlewares/exigir-tipo.js';
@@ -49,3 +50,10 @@ adminRouter.put('/questionario/pesos', exigirAdmin, questionarioAdminController.
 adminRouter.get('/tipos-pele', exigirAdmin, adminTipoPeleController.listar);
 adminRouter.post('/tipos-pele', exigirAdmin, adminTipoPeleController.criar);
 adminRouter.patch('/tipos-pele/:id', exigirAdmin, adminTipoPeleController.atualizar);
+
+// Catálogo de produtos.
+adminRouter.get('/produtos', exigirAdmin, adminProdutoController.listar);
+adminRouter.post('/produtos', exigirAdmin, adminProdutoController.criar);
+adminRouter.patch('/produtos/:id', exigirAdmin, adminProdutoController.atualizar);
+adminRouter.post('/produtos/associar', exigirAdmin, adminProdutoController.associar);
+adminRouter.post('/produtos/desassociar', exigirAdmin, adminProdutoController.desassociar);
