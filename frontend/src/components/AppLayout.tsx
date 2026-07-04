@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../features/auth/authContext';
+import { BottomNav } from './ui/BottomNav';
+import { IconDroplet } from './ui/icons';
 
 const TITULOS: Record<string, string> = {
   '/': 'Início',
@@ -17,41 +19,36 @@ const TITULOS: Record<string, string> = {
 };
 
 export function AppLayout() {
-  const { usuario, logout } = useAuth();
-  const navigate = useNavigate();
+  const { usuario } = useAuth();
   const location = useLocation();
+  const logado = Boolean(usuario);
 
   useEffect(() => {
     const nome = TITULOS[location.pathname];
     document.title = nome ? `${nome} · Derma Match` : 'Derma Match';
   }, [location.pathname]);
 
-  async function aoSair() {
-    await logout();
-    void navigate('/login', { replace: true });
-  }
-
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-brand-100 bg-white">
-        <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3">
-          <Link to="/" className="text-lg font-bold text-brand-600">
+    <div className="flex min-h-screen flex-col">
+      <header className="sticky top-0 z-10 border-b border-neutral-100 bg-[#f3f7f4]/90 backdrop-blur">
+        <div className="mx-auto flex max-w-md items-center px-4 py-3">
+          <Link
+            to={logado ? '/' : '/login'}
+            className="flex items-center gap-2 font-extrabold text-brand-700"
+          >
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-600 text-white">
+              <IconDroplet className="h-4 w-4" />
+            </span>
             Derma Match
           </Link>
-          {usuario && (
-            <button
-              type="button"
-              onClick={() => void aoSair()}
-              className="text-sm font-medium text-neutral-500 transition-colors hover:text-brand-600"
-            >
-              Sair
-            </button>
-          )}
         </div>
       </header>
-      <main className="mx-auto w-full max-w-md px-4 py-6">
+
+      <main className={`mx-auto w-full max-w-md flex-1 px-4 py-6 ${logado ? 'pb-28' : ''}`}>
         <Outlet />
       </main>
+
+      {logado && <BottomNav />}
     </div>
   );
 }

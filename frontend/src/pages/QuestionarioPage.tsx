@@ -5,7 +5,9 @@ import { ProgressoQuestionario } from '../components/questionario/ProgressoQuest
 import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
+import { PageHeader } from '../components/ui/PageHeader';
 import { Spinner } from '../components/ui/Spinner';
+import { IconSparkle } from '../components/ui/icons';
 import type { ResultadoTipoPele } from '../features/questionario/questionario.types';
 import {
   useEstadoQuestionario,
@@ -43,16 +45,20 @@ export function QuestionarioPage() {
   // Resultado recém-calculado
   if (resultado) {
     return (
-      <Card>
-        <div className="flex flex-col items-center gap-3 text-center">
-          <span className="text-4xl">✨</span>
-          <h1 className="text-xl font-bold text-neutral-800">Seu tipo de pele é</h1>
-          <p className="text-2xl font-bold text-brand-600 capitalize">{resultado.tipoPeleNome}</p>
-          <p className="text-sm text-neutral-600">
+      <Card className="bg-gradient-to-br from-brand-600 to-brand-700 text-white">
+        <div className="flex flex-col items-center gap-3 py-2 text-center">
+          <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15">
+            <IconSparkle className="h-8 w-8" />
+          </span>
+          <p className="text-sm font-semibold text-white/80">Seu tipo de pele é</p>
+          <p className="text-3xl font-extrabold capitalize">{resultado.tipoPeleNome}</p>
+          <p className="text-sm text-white/85">
             Preparamos uma rotina de cuidados pensada para você.
           </p>
-          <Link to="/rotina" className="w-full">
-            <Button fullWidth>Ver minha rotina</Button>
+          <Link to="/rotina" className="mt-2 w-full">
+            <Button variant="accent" fullWidth>
+              Ver minha rotina
+            </Button>
           </Link>
         </div>
       </Card>
@@ -76,34 +82,40 @@ export function QuestionarioPage() {
   // Já concluído (revisita)
   if (estado.estado === 'CONCLUIDO') {
     return (
-      <Card>
-        <h1 className="text-xl font-bold text-neutral-800">Questionário concluído</h1>
-        <p className="mt-2 text-sm text-neutral-600">Você já descobriu seu tipo de pele.</p>
-        <div className="mt-4 flex flex-col gap-2">
-          <Link to="/rotina">
-            <Button fullWidth>Ver minha rotina</Button>
-          </Link>
-          <Button variant="secondary" fullWidth loading={refazer.isPending} onClick={aoRefazer}>
-            Refazer questionário
-          </Button>
-        </div>
-      </Card>
+      <div>
+        <PageHeader titulo="Questionário" voltarPara="/" />
+        <Card>
+          <h2 className="text-lg font-extrabold text-neutral-800">Questionário concluído</h2>
+          <p className="mt-2 text-sm text-neutral-600">Você já descobriu seu tipo de pele.</p>
+          <div className="mt-4 flex flex-col gap-2">
+            <Link to="/rotina">
+              <Button fullWidth>Ver minha rotina</Button>
+            </Link>
+            <Button variant="secondary" fullWidth loading={refazer.isPending} onClick={aoRefazer}>
+              Refazer questionário
+            </Button>
+          </div>
+        </Card>
+      </div>
     );
   }
 
   // Não iniciado → intro
   if (estado.estado === 'NAO_INICIADO' && !iniciado) {
     return (
-      <Card>
-        <h1 className="text-xl font-bold text-neutral-800">Descubra seu tipo de pele</h1>
-        <p className="mt-2 text-sm text-neutral-600">
-          Responda algumas perguntas rápidas — sem digitar nada, é só escolher. No fim, você recebe
-          uma rotina personalizada.
-        </p>
-        <Button className="mt-4" fullWidth onClick={() => setIniciado(true)}>
-          Começar
-        </Button>
-      </Card>
+      <div>
+        <PageHeader titulo="Questionário" voltarPara="/" />
+        <Card>
+          <h2 className="text-lg font-extrabold text-neutral-800">Descubra seu tipo de pele</h2>
+          <p className="mt-2 text-sm text-neutral-600">
+            Responda algumas perguntas rápidas — sem digitar nada, é só escolher. No fim, você
+            recebe uma rotina personalizada.
+          </p>
+          <Button className="mt-4" fullWidth onClick={() => setIniciado(true)}>
+            Começar
+          </Button>
+        </Card>
+      </div>
     );
   }
 
@@ -122,6 +134,7 @@ export function QuestionarioPage() {
   if (pergunta) {
     return (
       <div className="flex flex-col gap-4">
+        <PageHeader titulo="Questionário" voltarPara="/" />
         <ProgressoQuestionario
           respondidas={estado.perguntasRespondidas}
           total={estado.totalPerguntas}
@@ -141,14 +154,14 @@ export function QuestionarioPage() {
   // Sem próxima pergunta → tudo respondido → finalizar
   return (
     <Card>
-      <div className="flex flex-col items-center gap-3 text-center">
-        <span className="text-3xl">🎉</span>
-        <h1 className="text-lg font-bold text-neutral-800">Tudo respondido!</h1>
+      <div className="flex flex-col items-center gap-3 py-2 text-center">
+        <span className="text-4xl">🎉</span>
+        <h2 className="text-lg font-extrabold text-neutral-800">Tudo respondido!</h2>
         <p className="text-sm text-neutral-600">Vamos calcular seu tipo de pele.</p>
         {finalizar.isError && (
           <Alert tipo="erro">Não foi possível finalizar. Tente novamente.</Alert>
         )}
-        <Button fullWidth loading={finalizar.isPending} onClick={aoFinalizar}>
+        <Button className="mt-1 w-full" loading={finalizar.isPending} onClick={aoFinalizar}>
           Ver meu resultado
         </Button>
       </div>

@@ -11,7 +11,9 @@ export const premiumApi = {
 
   // Assinatura mockada (sem cobrança). Envia o consentimento de dados sensíveis (ADR-0013).
   async assinar(): Promise<UsuarioResponse> {
-    const res = await api.post<UsuarioResponse>('/assinatura', { consentimentoDadosSensiveis: true });
+    const res = await api.post<UsuarioResponse>('/assinatura', {
+      consentimentoDadosSensiveis: true,
+    });
     return res.data;
   },
 

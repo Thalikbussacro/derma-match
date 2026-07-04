@@ -3,7 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
+import { PageHeader } from '../components/ui/PageHeader';
 import { Spinner } from '../components/ui/Spinner';
+import { IconChat } from '../components/ui/icons';
 import { useAuth } from '../features/auth/authContext';
 import { premiumApi } from '../features/premium/premium.api';
 import { usePainelUpgrade } from '../features/premium/usePremium';
@@ -46,16 +48,25 @@ export function PremiumPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-bold text-neutral-800">{data.titulo}</h1>
-        <p className="mt-1 text-sm text-neutral-600">{data.descricao}</p>
-      </div>
+    <div className="flex flex-col gap-5">
+      <PageHeader titulo="Premium" voltarPara="/" />
+
+      <Card className="bg-gradient-to-br from-accent-500 to-accent-600 text-white">
+        <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15">
+          <IconChat className="h-6 w-6" />
+        </span>
+        <h2 className="mt-3 text-xl font-extrabold">{data.titulo}</h2>
+        <p className="mt-1 text-sm text-white/85">{data.descricao}</p>
+      </Card>
+
       <Card>
         <ul className="flex flex-col gap-3">
           {data.beneficios.map((beneficio) => (
-            <li key={beneficio} className="flex items-start gap-2 text-sm text-neutral-700">
-              <span className="font-bold text-brand-600" aria-hidden="true">
+            <li key={beneficio} className="flex items-start gap-2.5 text-sm text-neutral-700">
+              <span
+                className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-600"
+                aria-hidden="true"
+              >
                 ✓
               </span>
               <span>{beneficio}</span>
@@ -73,9 +84,8 @@ export function PremiumPage() {
         </>
       ) : (
         <>
-          <Alert tipo="info">{data.aviso}</Alert>
           {erro && <Alert tipo="erro">{erro}</Alert>}
-          <label className="flex items-start gap-2 rounded-lg bg-brand-50 p-3 text-sm text-neutral-700">
+          <label className="flex items-start gap-2.5 rounded-xl bg-brand-50 p-3.5 text-sm text-neutral-700">
             <input
               type="checkbox"
               checked={consentiu}
@@ -89,7 +99,7 @@ export function PremiumPage() {
                 to="/privacidade"
                 target="_blank"
                 onClick={(e) => e.stopPropagation()}
-                className="text-brand-600 underline"
+                className="font-semibold text-brand-600 underline"
               >
                 política de privacidade
               </Link>
@@ -97,6 +107,7 @@ export function PremiumPage() {
             </span>
           </label>
           <Button
+            variant="accent"
             fullWidth
             loading={assinando}
             disabled={!consentiu}
@@ -105,7 +116,7 @@ export function PremiumPage() {
             Assinar Premium
           </Button>
           <p className="text-center text-xs text-neutral-500">
-            Simulação — sem cobrança real (projeto acadêmico).
+            {data.aviso} — sem cobrança real (projeto acadêmico).
           </p>
         </>
       )}

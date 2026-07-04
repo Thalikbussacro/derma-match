@@ -6,6 +6,7 @@ import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
+import { IconShield } from '../../components/ui/icons';
 import { loginSchema, type LoginForm } from '../../features/auth/auth.schemas';
 import { useBiomedicaAuth } from '../../features/biomedica/biomedicaAuthContext';
 import { mensagemDeErro } from '../../lib/erros';
@@ -35,11 +36,15 @@ export function BiomedicaLoginPage() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <div>
-        <h1 className="text-2xl font-bold text-neutral-800">Área da Biomédica</h1>
-        <p className="text-sm text-neutral-600">Entre para atender suas pacientes.</p>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col items-center gap-2 pt-2 text-center">
+        <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-sm">
+          <IconShield className="h-7 w-7" />
+        </span>
+        <h1 className="text-2xl font-extrabold text-neutral-800">Área da biomédica</h1>
+        <p className="text-sm text-neutral-500">Entre para atender suas pacientes.</p>
       </div>
+
       <Card>
         <form onSubmit={(e) => void aoEnviar(e)} className="flex flex-col gap-4" noValidate>
           {erro && <Alert tipo="erro">{erro}</Alert>}

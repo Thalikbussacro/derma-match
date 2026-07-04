@@ -3,10 +3,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { Alert } from '../components/ui/Alert';
+import { Avatar } from '../components/ui/Avatar';
+import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Spinner } from '../components/ui/Spinner';
+import { IconDownload, IconLogout, IconShield } from '../components/ui/icons';
 import { useAuth } from '../features/auth/authContext';
 import {
   editarNomeSchema,
@@ -110,6 +113,11 @@ export function ContaPage() {
     }
   }
 
+  async function sair() {
+    await logout();
+    void navigate('/login', { replace: true });
+  }
+
   if (perfilQuery.isLoading) {
     return (
       <div className="flex justify-center py-12 text-brand-500">
@@ -124,32 +132,23 @@ export function ContaPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="text-2xl font-bold text-neutral-800">Minha conta</h1>
+      <h1 className="text-2xl font-extrabold text-neutral-800">Minha conta</h1>
 
-      <Card className="flex flex-col gap-2 text-sm">
-        <div className="flex justify-between">
-          <span className="text-neutral-500">Nome</span>
-          <span className="font-medium text-neutral-800">{perfil.nome}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-neutral-500">Email</span>
-          <span className="font-medium text-neutral-800">{perfil.email}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-neutral-500">Plano</span>
-          <span className="font-medium text-neutral-800">{perfil.plano}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-neutral-500">Tipo de pele</span>
-          <span className="font-medium text-neutral-800">
-            {perfil.tipoPelePredominanteId ? 'Definido' : 'Não definido'}
-          </span>
+      <Card className="flex items-center gap-3.5">
+        <Avatar nome={perfil.nome} className="h-14 w-14 text-lg" />
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-extrabold text-neutral-800">{perfil.nome}</p>
+          <p className="truncate text-sm text-neutral-500">{perfil.email}</p>
+          <div className="mt-1.5 flex gap-2">
+            <Badge tom={perfil.plano === 'PREMIUM' ? 'accent' : 'neutral'}>{perfil.plano}</Badge>
+            {perfil.tipoPelePredominanteId && <Badge>Pele definida</Badge>}
+          </div>
         </div>
       </Card>
 
       {perfil.plano === 'PREMIUM' && (
         <Card>
-          <h2 className="font-semibold text-neutral-800">Plano Premium</h2>
+          <h2 className="font-extrabold text-neutral-800">Plano Premium</h2>
           <p className="mt-1 text-sm text-neutral-600">Seu plano Premium está ativo.</p>
           {erroCancel && (
             <div className="mt-3">
@@ -158,7 +157,7 @@ export function ContaPage() {
           )}
           {confirmandoCancel ? (
             <div className="mt-3 flex flex-col gap-2">
-              <p className="text-sm font-medium text-neutral-800">
+              <p className="text-sm font-semibold text-neutral-800">
                 Cancelar o Premium? Você perde o acesso ao chat com a biomédica.
               </p>
               <div className="flex gap-2">
@@ -184,7 +183,7 @@ export function ContaPage() {
       )}
 
       <Card>
-        <h2 className="mb-3 font-semibold text-neutral-800">Editar nome</h2>
+        <h2 className="mb-3 font-extrabold text-neutral-800">Editar nome</h2>
         <form onSubmit={(e) => void salvarNome(e)} className="flex flex-col gap-3" noValidate>
           {erroNome && <Alert tipo="erro">{erroNome}</Alert>}
           {msgNome && <Alert tipo="sucesso">{msgNome}</Alert>}
@@ -200,7 +199,7 @@ export function ContaPage() {
       </Card>
 
       <Card>
-        <h2 className="mb-3 font-semibold text-neutral-800">Trocar senha</h2>
+        <h2 className="mb-3 font-extrabold text-neutral-800">Trocar senha</h2>
         <form onSubmit={(e) => void salvarSenha(e)} className="flex flex-col gap-3" noValidate>
           {erroSenha && <Alert tipo="erro">{erroSenha}</Alert>}
           <Input
@@ -234,22 +233,34 @@ export function ContaPage() {
       </Card>
 
       <Card>
-        <h2 className="font-semibold text-neutral-800">Privacidade e dados</h2>
+        <div className="flex items-center gap-2">
+          <IconShield className="h-5 w-5 text-brand-600" />
+          <h2 className="font-extrabold text-neutral-800">Privacidade e dados</h2>
+        </div>
         <p className="mt-1 text-sm text-neutral-600">
           Baixe uma cópia dos seus dados ou consulte como tratamos suas informações.
         </p>
         <div className="mt-3 flex flex-col gap-2">
           <Button variant="secondary" loading={baixando} onClick={() => void baixarDados()}>
+            <IconDownload className="h-4 w-4" />
             Baixar meus dados
           </Button>
-          <Link to="/privacidade" className="text-center text-sm text-brand-600 hover:underline">
+          <Link
+            to="/privacidade"
+            className="text-center text-sm font-semibold text-brand-600 hover:underline"
+          >
             Política de privacidade
           </Link>
         </div>
       </Card>
 
+      <Button variant="ghost" fullWidth onClick={() => void sair()}>
+        <IconLogout className="h-4 w-4" />
+        Sair da conta
+      </Button>
+
       <Card className="border-red-200">
-        <h2 className="font-semibold text-red-700">Excluir conta</h2>
+        <h2 className="font-extrabold text-red-700">Excluir conta</h2>
         <p className="mt-1 text-sm text-neutral-600">
           Esta ação remove permanentemente sua conta e todas as suas respostas (LGPD). Não é
           possível desfazer.
@@ -261,7 +272,7 @@ export function ContaPage() {
         )}
         {confirmandoExclusao ? (
           <div className="mt-3 flex flex-col gap-2">
-            <p className="text-sm font-medium text-neutral-800">
+            <p className="text-sm font-semibold text-neutral-800">
               Tem certeza? Isso é irreversível.
             </p>
             <div className="flex gap-2">

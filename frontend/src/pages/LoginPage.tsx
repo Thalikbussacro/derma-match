@@ -9,6 +9,7 @@ import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
+import { IconDroplet } from '../components/ui/icons';
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -33,11 +34,15 @@ export function LoginPage() {
   });
 
   return (
-    <div className="flex flex-col gap-5">
-      <div>
-        <h1 className="text-2xl font-bold text-neutral-800">Entrar</h1>
-        <p className="text-sm text-neutral-600">Bem-vinda de volta ao Derma Match.</p>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col items-center gap-2 pt-2 text-center">
+        <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-sm">
+          <IconDroplet className="h-7 w-7" />
+        </span>
+        <h1 className="text-2xl font-extrabold text-neutral-800">Bem-vinda de volta</h1>
+        <p className="text-sm text-neutral-500">Entre para ver sua rotina de cuidados.</p>
       </div>
+
       <Card>
         <form onSubmit={(e) => void aoEnviar(e)} className="flex flex-col gap-4" noValidate>
           {erroApi && <Alert tipo="erro">{erroApi}</Alert>}
@@ -60,13 +65,14 @@ export function LoginPage() {
           </Button>
         </form>
       </Card>
+
       <div className="flex flex-col gap-2 text-center text-sm text-neutral-600">
-        <Link to="/recuperar-senha" className="text-brand-600 hover:underline">
+        <Link to="/recuperar-senha" className="font-semibold text-brand-600 hover:underline">
           Esqueci minha senha
         </Link>
         <span>
           Não tem conta?{' '}
-          <Link to="/cadastro" className="font-medium text-brand-600 hover:underline">
+          <Link to="/cadastro" className="font-bold text-brand-600 hover:underline">
             Criar conta
           </Link>
         </span>

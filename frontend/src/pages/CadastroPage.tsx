@@ -10,6 +10,7 @@ import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
+import { IconDroplet } from '../components/ui/icons';
 
 export function CadastroPage() {
   const { login } = useAuth();
@@ -38,11 +39,15 @@ export function CadastroPage() {
   });
 
   return (
-    <div className="flex flex-col gap-5">
-      <div>
-        <h1 className="text-2xl font-bold text-neutral-800">Criar conta</h1>
-        <p className="text-sm text-neutral-600">Descubra seu tipo de pele e sua rotina ideal.</p>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col items-center gap-2 pt-2 text-center">
+        <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-sm">
+          <IconDroplet className="h-7 w-7" />
+        </span>
+        <h1 className="text-2xl font-extrabold text-neutral-800">Criar sua conta</h1>
+        <p className="text-sm text-neutral-500">Descubra seu tipo de pele e a rotina ideal.</p>
       </div>
+
       <Card>
         <form onSubmit={(e) => void aoEnviar(e)} className="flex flex-col gap-4" noValidate>
           {erroApi && <Alert tipo="erro">{erroApi}</Alert>}
@@ -74,7 +79,7 @@ export function CadastroPage() {
             {...register('confirmarSenha')}
           />
           <div className="flex flex-col gap-1">
-            <label className="flex items-start gap-2 text-sm text-neutral-700">
+            <label className="flex items-start gap-2.5 text-sm text-neutral-600">
               <input
                 type="checkbox"
                 className="mt-0.5 h-4 w-4 accent-brand-600"
@@ -86,7 +91,7 @@ export function CadastroPage() {
                   to="/privacidade"
                   target="_blank"
                   onClick={(e) => e.stopPropagation()}
-                  className="text-brand-600 underline"
+                  className="font-semibold text-brand-600 underline"
                 >
                   política de privacidade
                 </Link>{' '}
@@ -94,7 +99,9 @@ export function CadastroPage() {
               </span>
             </label>
             {errors.aceiteLgpd && (
-              <span className="text-xs text-red-600">{errors.aceiteLgpd.message}</span>
+              <span className="text-xs font-semibold text-red-600">
+                {errors.aceiteLgpd.message}
+              </span>
             )}
           </div>
           <Button type="submit" fullWidth loading={isSubmitting}>
@@ -102,9 +109,10 @@ export function CadastroPage() {
           </Button>
         </form>
       </Card>
+
       <p className="text-center text-sm text-neutral-600">
         Já tem conta?{' '}
-        <Link to="/login" className="font-medium text-brand-600 hover:underline">
+        <Link to="/login" className="font-bold text-brand-600 hover:underline">
           Entrar
         </Link>
       </p>

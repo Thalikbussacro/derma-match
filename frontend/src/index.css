@@ -1,22 +1,31 @@
 @import 'tailwindcss';
 
-/* Tokens de marca (skincare): rosa primário e acento teal. Geram utilitários brand e accent. */
+/*
+  Tema Derma Match — acolhedor, inspirado em health-tech (NoHarm).
+  brand: verde-teal (saúde, confiança). accent: coral/pêssego (calor, skincare).
+*/
 @theme {
-  --color-brand-50: #fdf2f6;
-  --color-brand-100: #fce7ef;
-  --color-brand-200: #fbcfe0;
-  --color-brand-300: #f8a9c6;
-  --color-brand-400: #f272a3;
-  --color-brand-500: #e84c86;
-  --color-brand-600: #d42f6c;
-  --color-brand-700: #b21f56;
-  --color-brand-800: #931d49;
-  --color-brand-900: #7b1c40;
+  --color-brand-50: #f0faf6;
+  --color-brand-100: #d7f2e7;
+  --color-brand-200: #b1e5d2;
+  --color-brand-300: #7fd1b8;
+  --color-brand-400: #4bb799;
+  --color-brand-500: #2b9d80;
+  --color-brand-600: #1d7f6c;
+  --color-brand-700: #196658;
+  --color-brand-800: #175248;
+  --color-brand-900: #14433c;
 
-  --color-accent-500: #0d9488;
-  --color-accent-600: #0f766e;
+  --color-accent-50: #fff5f1;
+  --color-accent-100: #ffe7dc;
+  --color-accent-200: #ffcbb5;
+  --color-accent-300: #ffa886;
+  --color-accent-400: #fb835d;
+  --color-accent-500: #f26440;
+  --color-accent-600: #dd4a29;
+  --color-accent-700: #b83a20;
 
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-sans: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 html {
@@ -26,8 +35,8 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #faf7f8;
-  color: #334155;
+  background-color: #f3f7f4;
+  color: #2f3b37;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
@@ -37,4 +46,11 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+/* Rolagem suave e respeito a quem prefere menos movimento. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }

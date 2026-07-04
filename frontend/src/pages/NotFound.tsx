@@ -1,14 +1,18 @@
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
+import { EmptyState } from '../components/ui/EmptyState';
 
 export function NotFound() {
   return (
-    <div className="flex flex-col items-center gap-4 py-12 text-center">
-      <h1 className="text-2xl font-bold text-neutral-800">Página não encontrada</h1>
-      <p className="text-neutral-600">O endereço que você tentou acessar não existe.</p>
-      <Link to="/">
-        <Button variant="secondary">Voltar ao início</Button>
-      </Link>
-    </div>
+    <EmptyState
+      icone={<span className="text-3xl">🧭</span>}
+      titulo="Página não encontrada"
+      descricao="O endereço que você tentou acessar não existe."
+      acao={
+        <Link to="/">
+          <Button fullWidth>Voltar ao início</Button>
+        </Link>
+      }
+    />
   );
 }
