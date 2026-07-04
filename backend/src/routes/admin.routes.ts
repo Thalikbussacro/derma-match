@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { adminAuthController } from '../controllers/admin-auth.controller.js';
 import { adminBiomedicaController } from '../controllers/admin-biomedica.controller.js';
 import { adminConversaController } from '../controllers/admin-conversa.controller.js';
+import { adminDashboardController } from '../controllers/admin-dashboard.controller.js';
 import { adminProdutoController } from '../controllers/admin-produto.controller.js';
 import { adminTipoPeleController } from '../controllers/admin-tipo-pele.controller.js';
 import { questionarioAdminController } from '../controllers/questionario-admin.controller.js';
@@ -16,6 +17,7 @@ adminRouter.post('/refresh', adminAuthController.refresh);
 adminRouter.post('/logout', adminAuthController.logout);
 
 // Gestão (exige token de admin).
+adminRouter.get('/dashboard', exigirAdmin, adminDashboardController.obter);
 adminRouter.get('/biomedicas', exigirAdmin, adminBiomedicaController.listar);
 adminRouter.post('/biomedicas', exigirAdmin, adminBiomedicaController.criar);
 adminRouter.patch('/biomedicas/:id/ativa', exigirAdmin, adminBiomedicaController.definirAtiva);

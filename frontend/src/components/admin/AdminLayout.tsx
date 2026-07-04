@@ -38,9 +38,10 @@ export function AdminLayout() {
           )}
         </div>
         {admin && (
-          <nav className="mx-auto flex max-w-3xl gap-1 px-3">
+          <nav className="mx-auto flex max-w-3xl gap-1 overflow-x-auto px-3">
             {[
-              { to: '/admin', label: 'Biomédicas', end: true },
+              { to: '/admin', label: 'Painel', end: true },
+              { to: '/admin/biomedicas', label: 'Biomédicas', end: false },
               { to: '/admin/questionario', label: 'Questionário', end: false },
               { to: '/admin/tipos-pele', label: 'Tipos de pele', end: false },
               { to: '/admin/produtos', label: 'Produtos', end: false },
@@ -51,7 +52,7 @@ export function AdminLayout() {
                 to={item.to}
                 end={item.end}
                 className={({ isActive }) =>
-                  `rounded-t-lg px-3 py-2 text-sm font-bold transition-colors ${
+                  `whitespace-nowrap rounded-t-lg px-3 py-2 text-sm font-bold transition-colors ${
                     isActive ? 'bg-neutral-100 text-neutral-900' : 'text-white/70 hover:text-white'
                   }`
                 }

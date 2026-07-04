@@ -164,3 +164,14 @@ export interface ConversaAdmin {
 
 export const reatribuirSchema = z.object({ biomedicaId: z.number().int() }).strict();
 export type ReatribuirInput = z.infer<typeof reatribuirSchema>;
+
+// --- Dashboard (admin) ---
+
+export interface DashboardResponse {
+  usuariasFree: number;
+  usuariasPremium: number;
+  biomedicasAtivas: number;
+  biomedicasTotal: number;
+  conversas: number;
+  distribuicaoTipoPele: { nome: string; total: number }[];
+}

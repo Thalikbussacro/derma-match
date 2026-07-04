@@ -12,7 +12,7 @@ Monorepo **pnpm** com três pacotes:
 
 **Stack:** Node 22 · TypeScript strict · Express 5 · Prisma 6 / PostgreSQL 16 · Zod · JWT + bcrypt · Vitest · React 19 · Tailwind CSS.
 
-**Estado:** MVP + Premium concluídos — backend (Fases 0–4), frontend (Fases F0–F4) e Premium (chat com biomédica, fotos e assinatura mock — Fases P1–P8).
+**Estado:** MVP + Premium + plataforma clínica configurável concluídos — backend (Fases 0–4), frontend (F0–F4), Premium (P1–P8) e plataforma configurável (Fase 6: painel de admin, questionário versionado, espectro de tipos de pele, catálogo de produtos, atribuição de conversas e rotina personalizada por paciente).
 
 ## Pré-requisitos
 
@@ -63,6 +63,21 @@ A experiência Premium está implementada — assinatura **mockada** (sem cobran
 Biomédica de exemplo (do seed): **`biomedica@dermamatch.com`** / **`biomedica123`**.
 
 Limpeza (agendar via cron em produção): `pnpm --filter derma-match cleanup:tokens` (refresh tokens) e `cleanup:anexos` (fotos vencidas).
+
+## Administração e configuração (Fase 6)
+
+Um terceiro papel — **admin** — com login e área próprios em `/admin`. Admin de exemplo (do seed): **`admin@dermamatch.com`** / **`admin123`**.
+
+O admin gerencia:
+
+- **Biomédicas** — cadastro, ativação/desativação.
+- **Questionário** — perguntas, opções e pesos por tipo de pele, com **versionamento** (edita um rascunho e publica; resultados já calculados não mudam).
+- **Tipos de pele** — nome, descrição e **ordem no espectro** (base do nível 1–5 calculado no resultado).
+- **Produtos** — catálogo, com sugestões amarradas às respostas do questionário.
+- **Conversas** — reatribuição entre biomédicas (cada conversa tem uma biomédica; atribuição automática por menor carga).
+- **Painel** — indicadores (usuárias, biomédicas, conversas, distribuição por tipo de pele).
+
+A **biomédica** passa a editar a **rotina personalizada** de cada paciente (itens por etapa + produtos do catálogo); a usuária vê a rotina personalizada no lugar da base, com selo de atualização. Decisões em `.claude/decisions/0016-plataforma-clinica-configuravel.md`.
 
 ## Scripts (raiz do workspace)
 

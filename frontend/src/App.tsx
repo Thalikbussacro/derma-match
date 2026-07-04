@@ -30,6 +30,7 @@ import { AdminQuestionarioPage } from './pages/admin/AdminQuestionarioPage';
 import { AdminTiposPelePage } from './pages/admin/AdminTiposPelePage';
 import { AdminProdutosPage } from './pages/admin/AdminProdutosPage';
 import { AdminConversasPage } from './pages/admin/AdminConversasPage';
+import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 
 export default function App() {
   return (
@@ -158,6 +159,14 @@ export default function App() {
           <Route path="login" element={<AdminLoginPage />} />
           <Route
             index
+            element={
+              <RequireAdmin>
+                <AdminDashboardPage />
+              </RequireAdmin>
+            }
+          />
+          <Route
+            path="biomedicas"
             element={
               <RequireAdmin>
                 <AdminBiomedicasPage />

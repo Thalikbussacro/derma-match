@@ -3,6 +3,7 @@ import type {
   AdminResponse,
   AssociarProdutoInput,
   ConversaAdmin,
+  DashboardResponse,
   AtualizarPerguntaInput,
   AtualizarProdutoInput,
   AtualizarTipoPeleInput,
@@ -123,5 +124,10 @@ export const adminApi = {
   },
   async reatribuirConversa(id: number, biomedicaId: number): Promise<void> {
     await apiAdmin.patch(`/admin/conversas/${id}/biomedica`, { biomedicaId });
+  },
+
+  async dashboard(): Promise<DashboardResponse> {
+    const res = await apiAdmin.get<DashboardResponse>('/admin/dashboard');
+    return res.data;
   },
 };
