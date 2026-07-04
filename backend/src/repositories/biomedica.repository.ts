@@ -14,4 +14,21 @@ export const biomedicaRepository = {
   buscarAtiva(): Promise<Biomedica | null> {
     return prisma.biomedica.findFirst({ where: { ativa: true }, orderBy: { id: 'asc' } });
   },
+
+  criar(data: {
+    nome: string;
+    registro: string;
+    email: string;
+    senhaHash: string;
+  }): Promise<Biomedica> {
+    return prisma.biomedica.create({ data });
+  },
+
+  listar(): Promise<Biomedica[]> {
+    return prisma.biomedica.findMany({ orderBy: { id: 'asc' } });
+  },
+
+  atualizarAtiva(id: number, ativa: boolean): Promise<Biomedica> {
+    return prisma.biomedica.update({ where: { id }, data: { ativa } });
+  },
 };
