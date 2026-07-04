@@ -3,6 +3,7 @@ import { adminAuthController } from '../controllers/admin-auth.controller.js';
 import { adminBiomedicaController } from '../controllers/admin-biomedica.controller.js';
 import { adminConversaController } from '../controllers/admin-conversa.controller.js';
 import { adminDashboardController } from '../controllers/admin-dashboard.controller.js';
+import { adminDicaController } from '../controllers/admin-dica.controller.js';
 import { adminProdutoController } from '../controllers/admin-produto.controller.js';
 import { adminTipoPeleController } from '../controllers/admin-tipo-pele.controller.js';
 import { questionarioAdminController } from '../controllers/questionario-admin.controller.js';
@@ -64,3 +65,8 @@ adminRouter.post('/produtos/desassociar', exigirAdmin, adminProdutoController.de
 // Conversas (atribuição).
 adminRouter.get('/conversas', exigirAdmin, adminConversaController.listar);
 adminRouter.patch('/conversas/:id/biomedica', exigirAdmin, adminConversaController.reatribuir);
+
+// Conteúdo educativo (dicas).
+adminRouter.get('/dicas', exigirAdmin, adminDicaController.listar);
+adminRouter.post('/dicas', exigirAdmin, adminDicaController.criar);
+adminRouter.patch('/dicas/:id', exigirAdmin, adminDicaController.atualizar);

@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom';
-import { IconChat, IconDroplet, IconHome, IconUser } from './icons';
+import { IconChat, IconClipboard, IconDroplet, IconHome, IconUser } from './icons';
 
 const TABS = [
   { to: '/', label: 'Início', Icon: IconHome, end: true },
   { to: '/rotina', label: 'Rotina', Icon: IconDroplet, end: false },
+  { to: '/diario', label: 'Diário', Icon: IconClipboard, end: false },
   { to: '/chat', label: 'Atendimento', Icon: IconChat, end: false },
   { to: '/conta', label: 'Conta', Icon: IconUser, end: false },
 ];

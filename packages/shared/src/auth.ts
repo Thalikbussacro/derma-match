@@ -46,6 +46,7 @@ export const usuarioResponseSchema = z.object({
   email: z.string(),
   plano: z.enum(PLANOS),
   tipoPelePredominanteId: z.number().nullable(),
+  metaPele: z.string().nullable(),
 });
 export type UsuarioResponse = z.infer<typeof usuarioResponseSchema>;
 

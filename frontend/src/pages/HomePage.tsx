@@ -5,6 +5,7 @@ import { Card } from '../components/ui/Card';
 import { Spinner } from '../components/ui/Spinner';
 import { IconBack, IconChat, IconDroplet, IconSparkle } from '../components/ui/icons';
 import { useAuth } from '../features/auth/authContext';
+import { useDicas } from '../features/acompanhamento/useAcompanhamento';
 import { useEstadoQuestionario } from '../features/questionario/useQuestionario';
 
 function AcaoCard({
@@ -39,6 +40,7 @@ function AcaoCard({
 export function HomePage() {
   const { usuario } = useAuth();
   const { data: estado, isLoading } = useEstadoQuestionario();
+  const { data: dicas } = useDicas();
   const concluido = estado?.estado === 'CONCLUIDO';
   const ehPremium = usuario?.plano === 'PREMIUM';
   const primeiroNome = usuario?.nome.split(' ')[0] ?? '';
@@ -99,6 +101,22 @@ export function HomePage() {
             </Button>
           </Link>
         </Card>
+      )}
+
+      {dicas && dicas.length > 0 && (
+        <div>
+          <h2 className="mb-2 px-1 text-sm font-extrabold uppercase tracking-wide text-neutral-500">
+            Dicas de skincare
+          </h2>
+          <div className="flex flex-col gap-2">
+            {dicas.slice(0, 3).map((d) => (
+              <Card key={d.id}>
+                <p className="font-bold text-neutral-800">💡 {d.titulo}</p>
+                <p className="mt-1 text-sm text-neutral-600">{d.conteudo}</p>
+              </Card>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

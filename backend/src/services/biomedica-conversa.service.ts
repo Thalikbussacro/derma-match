@@ -2,6 +2,7 @@ import type {
   ContextoClinicoResponse,
   ConversaBiomedicaResponse,
   MensagemResponse,
+  RegistroDiarioResponse,
 } from '@derma-match/shared';
 import type { Conversa } from '@prisma/client';
 import { NotFoundError } from '../errors/http-error.js';
@@ -10,7 +11,9 @@ import { mensagemRepository } from '../repositories/mensagem.repository.js';
 import { respostaUsuarioRepository } from '../repositories/resposta-usuario.repository.js';
 import { tipoPeleRepository } from '../repositories/tipo-pele.repository.js';
 import { usuarioRepository } from '../repositories/usuario.repository.js';
+import { adesaoService } from './adesao.service.js';
 import { mensagemResponse } from './conversa.service.js';
+import { diarioService } from './diario.service.js';
 
 // Biomédica só acessa conversas dela; conversa alheia é tratada como inexistente (RNF-LGPD-005).
 async function garantirConversa(conversaId: number, biomedicaId: number): Promise<Conversa> {
@@ -69,11 +72,20 @@ export const biomedicaConversaService = {
       ? await tipoPeleRepository.buscarPorId(usuario.tipoPelePredominanteId)
       : null;
     const respostas = await respostaUsuarioRepository.listarComContexto(usuario.id);
+    const adesao = await adesaoService.obter(usuario.id);
     return {
       usuarioNome: usuario.nome,
       tipoPeleNome: tipoPele?.nome ?? null,
       tipoPeleNivel: usuario.tipoPeleNivel,
+      meta: usuario.metaPele,
+      adesao,
       respostas: respostas.map((r) => ({ pergunta: r.pergunta.texto, resposta: r.opcao.texto })),
     };
+  },
+
+  // Diário de pele da paciente (só leitura; autorização pela conversa da biomédica).
+  async diario(biomedicaId: number, conversaId: number): Promise<RegistroDiarioResponse[]> {
+    const conversa = await garantirConversa(conversaId, biomedicaId);
+    return diarioService.listarDe(conversa.usuarioId);
   },
 };

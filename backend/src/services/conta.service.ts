@@ -19,6 +19,7 @@ function paraResponse(usuario: Usuario): UsuarioResponse {
     email: usuario.email,
     plano: usuario.plano,
     tipoPelePredominanteId: usuario.tipoPelePredominanteId,
+    metaPele: usuario.metaPele,
   };
 }
 
@@ -28,6 +29,12 @@ export const contaService = {
     if (!usuario) {
       throw new NotFoundError('Usuário');
     }
+    return paraResponse(usuario);
+  },
+
+  async definirMeta(usuarioId: number, meta: string | null): Promise<UsuarioResponse> {
+    const limpa = meta && meta.trim() ? meta.trim() : null;
+    const usuario = await usuarioRepository.atualizar(usuarioId, { metaPele: limpa });
     return paraResponse(usuario);
   },
 

@@ -59,4 +59,16 @@ export const biomedicaConversaController = {
       next(err);
     }
   },
+
+  diario: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const registros = await biomedicaConversaService.diario(
+        biomedicaIdAutenticado(req),
+        conversaIdParam(req),
+      );
+      res.status(200).json({ registros });
+    } catch (err) {
+      next(err);
+    }
+  },
 };

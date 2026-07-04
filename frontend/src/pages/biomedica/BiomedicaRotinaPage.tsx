@@ -76,7 +76,9 @@ function RotinaEditor({
           <IconBack className="h-5 w-5" />
         </button>
         <div className="min-w-0 flex-1">
-          <h1 className="truncate font-extrabold text-neutral-800">Rotina de {dados.usuarioNome}</h1>
+          <h1 className="truncate font-extrabold text-neutral-800">
+            Rotina de {dados.usuarioNome}
+          </h1>
           <p className="text-xs text-neutral-500">
             {dados.atualizadoEm
               ? `Personalizada · atualizada em ${formatarData(dados.atualizadoEm)}`

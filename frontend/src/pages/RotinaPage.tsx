@@ -5,6 +5,8 @@ import { Card } from '../components/ui/Card';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Spinner } from '../components/ui/Spinner';
 import { IconClipboard, IconDroplet } from '../components/ui/icons';
+import { AdesaoCard } from '../components/acompanhamento/AdesaoCard';
+import { MetaCard } from '../components/acompanhamento/MetaCard';
 import { ETAPA_LABEL } from '../features/rotina/rotina.api';
 import { useRotina } from '../features/rotina/useRotina';
 import { formatarData } from '../lib/datas';
@@ -66,6 +68,9 @@ export function RotinaPage() {
           </p>
         )}
       </Card>
+
+      <AdesaoCard />
+      <MetaCard />
 
       <div>
         <h2 className="mb-3 px-1 text-sm font-extrabold uppercase tracking-wide text-neutral-500">

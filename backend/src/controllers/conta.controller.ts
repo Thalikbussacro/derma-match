@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
+import { definirMetaSchema } from '@derma-match/shared';
 import { usuarioIdAutenticado } from '../lib/usuario-autenticado.js';
 import { atualizarContaSchema } from '../schemas/conta.schema.js';
 import { contaService } from '../services/conta.service.js';
@@ -7,6 +8,16 @@ export const contaController = {
   buscarPerfil: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const perfil = await contaService.buscarPerfil(usuarioIdAutenticado(req));
+      res.status(200).json(perfil);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  definirMeta: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { meta } = definirMetaSchema.parse(req.body);
+      const perfil = await contaService.definirMeta(usuarioIdAutenticado(req), meta);
       res.status(200).json(perfil);
     } catch (err) {
       next(err);

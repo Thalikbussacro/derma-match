@@ -2,8 +2,11 @@ import axios from 'axios';
 import type {
   AdminResponse,
   AssociarProdutoInput,
+  AtualizarDicaInput,
   ConversaAdmin,
+  CriarDicaInput,
   DashboardResponse,
+  DicaAdmin,
   AtualizarPerguntaInput,
   AtualizarProdutoInput,
   AtualizarTipoPeleInput,
@@ -129,5 +132,17 @@ export const adminApi = {
   async dashboard(): Promise<DashboardResponse> {
     const res = await apiAdmin.get<DashboardResponse>('/admin/dashboard');
     return res.data;
+  },
+
+  // --- Dicas ---
+  async dicas(): Promise<DicaAdmin[]> {
+    const res = await apiAdmin.get<DicaAdmin[]>('/admin/dicas');
+    return res.data;
+  },
+  async criarDica(input: CriarDicaInput): Promise<void> {
+    await apiAdmin.post('/admin/dicas', input);
+  },
+  async atualizarDica(id: number, input: AtualizarDicaInput): Promise<void> {
+    await apiAdmin.patch(`/admin/dicas/${id}`, input);
   },
 };

@@ -12,6 +12,7 @@ function paraResponse(usuario: Usuario): UsuarioResponse {
     email: usuario.email,
     plano: usuario.plano,
     tipoPelePredominanteId: usuario.tipoPelePredominanteId,
+    metaPele: usuario.metaPele,
   };
 }
 

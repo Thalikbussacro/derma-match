@@ -24,4 +24,9 @@ export const contaApi = {
     const res = await api.get<unknown>('/me/dados');
     return res.data;
   },
+
+  async definirMeta(meta: string | null): Promise<Usuario> {
+    const res = await api.put<Usuario>('/me/meta', { meta });
+    return res.data;
+  },
 };

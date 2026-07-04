@@ -35,6 +35,7 @@ model Usuario {
   plano                         Plano     @default(FREE)
   tipoPelePredominanteId        Int?      @map("tipo_pele_predominante_id")
   tipoPeleNivel                 Int?      @map("tipo_pele_nivel")
+  metaPele                      String?   @map("meta_pele")
   questionarioVersaoId          Int?      @map("questionario_versao_id")
   consentimentoLgpdEm           DateTime  @map("consentimento_lgpd_em")
   consentimentoVersao           String    @default("1.0") @map("consentimento_versao") @db.VarChar(20)
@@ -51,6 +52,8 @@ model Usuario {
   respostas              RespostaUsuario[]
   conversas              Conversa[]
   rotinaPersonalizada    RotinaPersonalizada?
+  registrosDiario        RegistroDiario[]
+  checkinsRotina         CheckinRotina[]
 
   @@map("usuarios")
 }
@@ -185,6 +188,47 @@ model ItemRotinaPersonalizada {
 
   @@index([rotinaPersonalizadaId, ordem])
   @@map("itens_rotina_personalizada")
+}
+
+// --- Acompanhamento contínuo (Fase 7 — ADR-0017) ---
+
+// Diário de pele: a usuária registra como a pele está ao longo do tempo (sem foto).
+model RegistroDiario {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int      @map("usuario_id")
+  condicao  Int // 1 (ruim) a 5 (ótima)
+  tags      String[]
+  nota      String?
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId, criadoEm])
+  @@map("registros_diario")
+}
+
+// Adesão: um check-in por dia (a usuária confirma que seguiu a rotina).
+model CheckinRotina {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int      @map("usuario_id")
+  dia       DateTime @db.Date
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, dia])
+  @@map("checkins_rotina")
+}
+
+// Conteúdo educativo publicado pelo admin.
+model Dica {
+  id       Int      @id @default(autoincrement())
+  titulo   String   @db.VarChar(160)
+  conteudo String
+  ativa    Boolean  @default(true)
+  criadoEm DateTime @default(now()) @map("criado_em")
+
+  @@map("dicas")
 }
 
 // Trilha clínica: quem alterou a rotina da paciente e quando.

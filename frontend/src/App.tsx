@@ -14,6 +14,7 @@ import { RotinaPage } from './pages/RotinaPage';
 import { PremiumPage } from './pages/PremiumPage';
 import { ContaPage } from './pages/ContaPage';
 import { ChatPage } from './pages/ChatPage';
+import { DiarioPage } from './pages/DiarioPage';
 import { BiomedicaLayout } from './components/biomedica/BiomedicaLayout';
 import { RequireBiomedica } from './components/biomedica/RequireBiomedica';
 import { BiomedicaAuthProvider } from './features/biomedica/BiomedicaAuthProvider';
@@ -31,6 +32,7 @@ import { AdminTiposPelePage } from './pages/admin/AdminTiposPelePage';
 import { AdminProdutosPage } from './pages/admin/AdminProdutosPage';
 import { AdminConversasPage } from './pages/admin/AdminConversasPage';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
+import { AdminDicasPage } from './pages/admin/AdminDicasPage';
 
 export default function App() {
   return (
@@ -80,6 +82,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <RotinaPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/diario"
+            element={
+              <RequireAuth>
+                <DiarioPage />
               </RequireAuth>
             }
           />
@@ -202,6 +212,14 @@ export default function App() {
             element={
               <RequireAdmin>
                 <AdminConversasPage />
+              </RequireAdmin>
+            }
+          />
+          <Route
+            path="dicas"
+            element={
+              <RequireAdmin>
+                <AdminDicasPage />
               </RequireAdmin>
             }
           />

@@ -406,6 +406,36 @@ async function seedBiomedica(): Promise<void> {
   });
 }
 
+// Conteúdo educativo de exemplo (Fase 7). Ilustrativo, não é orientação real.
+const dicas: { titulo: string; conteudo: string }[] = [
+  {
+    titulo: 'Protetor solar todo dia',
+    conteudo:
+      'Use protetor solar mesmo em dias nublados e dentro de casa perto de janelas. É o passo que mais previne o envelhecimento precoce da pele.',
+  },
+  {
+    titulo: 'Introduza ativos aos poucos',
+    conteudo:
+      'Ao começar um ácido ou retinoide, use 2x por semana e aumente aos poucos, observando como a pele reage.',
+  },
+  {
+    titulo: 'Hidrate mesmo pele oleosa',
+    conteudo: 'Pele oleosa também precisa de hidratação. Prefira fórmulas oil-free em gel.',
+  },
+  {
+    titulo: 'Não durma de maquiagem',
+    conteudo:
+      'Limpar o rosto à noite remove sujeira, sebo e maquiagem, evitando cravos e espinhas.',
+  },
+];
+
+async function seedDicas(): Promise<void> {
+  await prisma.dica.deleteMany();
+  for (const dica of dicas) {
+    await prisma.dica.create({ data: dica });
+  }
+}
+
 // Um admin único (ADR-0016) — gerencia biomédicas, questionário, tipos de pele e produtos.
 async function seedAdmin(): Promise<void> {
   const senhaHash = await bcrypt.hash('admin123', 10);
@@ -426,6 +456,7 @@ async function main(): Promise<void> {
   await seedQuestionario(tiposPeleIds);
   await seedRotinas(tiposPeleIds);
   await seedProdutos();
+  await seedDicas();
   await seedBiomedica();
   await seedAdmin();
 }
@@ -434,7 +465,7 @@ try {
   await main();
   console.log(
     `seed concluído: ${tiposPele.length} tipos de pele, ${perguntas.length} perguntas, ` +
-      `${rotinas.length} rotinas, ${produtos.length} produtos, 1 biomédica, 1 admin.`,
+      `${rotinas.length} rotinas, ${produtos.length} produtos, ${dicas.length} dicas, 1 biomédica, 1 admin.`,
   );
 } catch (err) {
   console.error('falha no seed:', err);

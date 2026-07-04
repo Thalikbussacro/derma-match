@@ -5,3 +5,4 @@ export * from './rotina.js';
 export * from './premium.js';
 export * from './chat.js';
 export * from './admin.js';
+export * from './acompanhamento.js';

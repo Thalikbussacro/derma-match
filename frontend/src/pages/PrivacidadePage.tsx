@@ -23,8 +23,9 @@ export function PrivacidadePage() {
         </Secao>
 
         <Secao titulo="Dados que coletamos">
-          Nome e email (cadastro); respostas do questionário de pele; tipo de pele calculado. No
-          plano Premium: mensagens do chat e fotos da sua pele enviadas para análise.
+          Nome e email (cadastro); respostas do questionário de pele; tipo de pele calculado;
+          registros do seu diário de pele (condição, tags e notas) e sua meta de cuidado. No plano
+          Premium: mensagens do chat e fotos da sua pele enviadas para análise.
         </Secao>
 
         <Secao titulo="Finalidade e base legal">

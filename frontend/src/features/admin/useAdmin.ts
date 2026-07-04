@@ -71,6 +71,17 @@ export function useDashboard() {
   return useQuery({ queryKey: ['admin', 'dashboard'], queryFn: () => adminApi.dashboard() });
 }
 
+const CHAVE_DICAS = ['admin', 'dicas'];
+
+export function useDicasAdmin() {
+  return useQuery({ queryKey: CHAVE_DICAS, queryFn: () => adminApi.dicas() });
+}
+
+export function useInvalidarDicas() {
+  const qc = useQueryClient();
+  return () => qc.invalidateQueries({ queryKey: CHAVE_DICAS });
+}
+
 export function useInvalidarConversas() {
   const qc = useQueryClient();
   return () => qc.invalidateQueries({ queryKey: CHAVE_CONVERSAS });

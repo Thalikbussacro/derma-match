@@ -8,11 +8,14 @@ import { Spinner } from '../../components/ui/Spinner';
 import { IconBack, IconSend } from '../../components/ui/icons';
 import {
   useContextoClinico,
+  useDiarioPaciente,
   useMensagensBiomedica,
   useResponderBiomedica,
 } from '../../features/biomedica/useBiomedica';
 import { apiBiomedica } from '../../lib/apiBiomedica';
-import { formatarHora } from '../../lib/datas';
+import { formatarData, formatarHora } from '../../lib/datas';
+
+const FACES_DIARIO = ['', '😣', '😕', '😐', '🙂', '😃'];
 
 export function BiomedicaAtendimentoPage() {
   const { id } = useParams();
@@ -24,6 +27,7 @@ export function BiomedicaAtendimentoPage() {
   const [verContexto, setVerContexto] = useState(false);
   const mensagensQuery = useMensagensBiomedica(conversaId);
   const contextoQuery = useContextoClinico(conversaId, verContexto);
+  const diarioQuery = useDiarioPaciente(conversaId, verContexto);
   const responder = useResponderBiomedica(conversaId);
   const [texto, setTexto] = useState('');
   const fimRef = useRef<HTMLDivElement>(null);
@@ -103,6 +107,36 @@ export function BiomedicaAtendimentoPage() {
                     </span>
                   )}
                 </p>
+                {contextoQuery.data.meta && (
+                  <p>
+                    <span className="text-neutral-500">Meta: </span>
+                    <span className="font-semibold text-neutral-800">
+                      {contextoQuery.data.meta}
+                    </span>
+                  </p>
+                )}
+                <p>
+                  <span className="text-neutral-500">Adesão: </span>
+                  <span className="font-semibold text-neutral-800">
+                    {contextoQuery.data.adesao.streak} dia(s) seguidos ·{' '}
+                    {contextoQuery.data.adesao.ultimos7.filter(Boolean).length}/7 na semana
+                  </span>
+                </p>
+                {diarioQuery.data && diarioQuery.data.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold text-neutral-500">Diário recente</p>
+                    <div className="mt-1 flex flex-col gap-1">
+                      {diarioQuery.data.slice(0, 5).map((r) => (
+                        <p key={r.id} className="text-neutral-700">
+                          <span className="text-neutral-400">{formatarData(r.criadoEm)}</span>{' '}
+                          {FACES_DIARIO[r.condicao]}
+                          {r.tags.length > 0 && ` · ${r.tags.join(', ')}`}
+                          {r.nota && ` — ${r.nota}`}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div className="flex flex-col gap-2">
                   {contextoQuery.data.respostas.map((r) => (
                     <div key={r.pergunta}>

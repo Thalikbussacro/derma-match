@@ -30,6 +30,11 @@ biomedicaRouter.get(
   exigirBiomedica,
   biomedicaConversaController.contexto,
 );
+biomedicaRouter.get(
+  '/conversas/:id/diario',
+  exigirBiomedica,
+  biomedicaConversaController.diario,
+);
 
 // Rotina personalizada da paciente.
 biomedicaRouter.get('/conversas/:id/rotina', exigirBiomedica, biomedicaRotinaController.obter);

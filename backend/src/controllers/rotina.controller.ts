@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { usuarioIdAutenticado } from '../lib/usuario-autenticado.js';
+import { adesaoService } from '../services/adesao.service.js';
 import { rotinaService } from '../services/rotina.service.js';
 
 export const rotinaController = {
@@ -7,6 +8,22 @@ export const rotinaController = {
     try {
       const rotina = await rotinaService.buscarDoUsuario(usuarioIdAutenticado(req));
       res.status(200).json(rotina);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  checkin: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      res.status(200).json(await adesaoService.marcarHoje(usuarioIdAutenticado(req)));
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  adesao: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      res.status(200).json(await adesaoService.obter(usuarioIdAutenticado(req)));
     } catch (err) {
       next(err);
     }

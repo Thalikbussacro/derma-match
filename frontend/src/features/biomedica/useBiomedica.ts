@@ -45,3 +45,11 @@ export function useRotinaEdicao(conversaId: number) {
     queryFn: () => biomedicaApi.rotina(conversaId),
   });
 }
+
+export function useDiarioPaciente(conversaId: number, habilitado: boolean) {
+  return useQuery({
+    queryKey: ['biomedica', 'diario', conversaId],
+    queryFn: () => biomedicaApi.diario(conversaId),
+    enabled: habilitado,
+  });
+}

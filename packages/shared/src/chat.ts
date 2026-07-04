@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { adesaoResponseSchema } from './acompanhamento.js';
 
 export const AUTORES_MENSAGEM = ['USUARIA', 'BIOMEDICA'] as const;
 export type AutorMensagem = (typeof AUTORES_MENSAGEM)[number];
@@ -40,6 +41,8 @@ export const contextoClinicoResponseSchema = z.object({
   usuarioNome: z.string(),
   tipoPeleNome: z.string().nullable(),
   tipoPeleNivel: z.number().nullable(),
+  meta: z.string().nullable(),
+  adesao: adesaoResponseSchema,
   respostas: z.array(z.object({ pergunta: z.string(), resposta: z.string() })),
 });
 export type ContextoClinicoResponse = z.infer<typeof contextoClinicoResponseSchema>;
