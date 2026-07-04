@@ -28,6 +28,7 @@ import { AdminLoginPage } from './pages/admin/AdminLoginPage';
 import { AdminQuestionarioPage } from './pages/admin/AdminQuestionarioPage';
 import { AdminTiposPelePage } from './pages/admin/AdminTiposPelePage';
 import { AdminProdutosPage } from './pages/admin/AdminProdutosPage';
+import { AdminConversasPage } from './pages/admin/AdminConversasPage';
 
 export default function App() {
   return (
@@ -175,6 +176,14 @@ export default function App() {
             element={
               <RequireAdmin>
                 <AdminProdutosPage />
+              </RequireAdmin>
+            }
+          />
+          <Route
+            path="conversas"
+            element={
+              <RequireAdmin>
+                <AdminConversasPage />
               </RequireAdmin>
             }
           />

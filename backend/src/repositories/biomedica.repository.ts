@@ -15,6 +15,21 @@ export const biomedicaRepository = {
     return prisma.biomedica.findFirst({ where: { ativa: true }, orderBy: { id: 'asc' } });
   },
 
+  // Biomédica ativa com menos conversas (menor carga). Empate → menor id (C5).
+  async buscarComMenorCarga(): Promise<Biomedica | null> {
+    const biomedicas = await prisma.biomedica.findMany({
+      where: { ativa: true },
+      include: { _count: { select: { conversas: true } } },
+      orderBy: { id: 'asc' },
+    });
+    if (biomedicas.length === 0) {
+      return null;
+    }
+    return biomedicas.reduce((menor, b) =>
+      b._count.conversas < menor._count.conversas ? b : menor,
+    );
+  },
+
   criar(data: {
     nome: string;
     registro: string;

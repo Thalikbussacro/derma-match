@@ -60,3 +60,14 @@ export function useInvalidarProdutos() {
   const qc = useQueryClient();
   return () => qc.invalidateQueries({ queryKey: CHAVE_PRODUTOS });
 }
+
+const CHAVE_CONVERSAS = ['admin', 'conversas'];
+
+export function useConversasAdmin() {
+  return useQuery({ queryKey: CHAVE_CONVERSAS, queryFn: () => adminApi.conversas() });
+}
+
+export function useInvalidarConversas() {
+  const qc = useQueryClient();
+  return () => qc.invalidateQueries({ queryKey: CHAVE_CONVERSAS });
+}

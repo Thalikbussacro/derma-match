@@ -2,6 +2,7 @@ import axios from 'axios';
 import type {
   AdminResponse,
   AssociarProdutoInput,
+  ConversaAdmin,
   AtualizarPerguntaInput,
   AtualizarProdutoInput,
   AtualizarTipoPeleInput,
@@ -113,5 +114,14 @@ export const adminApi = {
   },
   async desassociarProduto(input: AssociarProdutoInput): Promise<void> {
     await apiAdmin.post('/admin/produtos/desassociar', input);
+  },
+
+  // --- Conversas (atribuição) ---
+  async conversas(): Promise<ConversaAdmin[]> {
+    const res = await apiAdmin.get<ConversaAdmin[]>('/admin/conversas');
+    return res.data;
+  },
+  async reatribuirConversa(id: number, biomedicaId: number): Promise<void> {
+    await apiAdmin.patch(`/admin/conversas/${id}/biomedica`, { biomedicaId });
   },
 };

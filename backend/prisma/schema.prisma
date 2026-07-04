@@ -269,8 +269,8 @@ model Conversa {
   biomedica Biomedica  @relation(fields: [biomedicaId], references: [id])
   mensagens Mensagem[]
 
-  // Uma conversa por par (usuária, biomédica).
-  @@unique([usuarioId, biomedicaId])
+  // Uma conversa ativa por usuária, atribuída a uma única biomédica (ADR-0016 / C5).
+  @@unique([usuarioId])
   @@index([biomedicaId, ultimaAtividade])
   @@map("conversas")
 }

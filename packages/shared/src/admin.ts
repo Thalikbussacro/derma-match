@@ -150,3 +150,17 @@ export const associarProdutoSchema = z
   .object({ opcaoId: z.number().int(), produtoId: z.number().int() })
   .strict();
 export type AssociarProdutoInput = z.infer<typeof associarProdutoSchema>;
+
+// --- Conversas (admin) ---
+
+export interface ConversaAdmin {
+  id: number;
+  usuarioNome: string;
+  biomedicaId: number;
+  biomedicaNome: string;
+  mensagens: number;
+  ultimaAtividade: string;
+}
+
+export const reatribuirSchema = z.object({ biomedicaId: z.number().int() }).strict();
+export type ReatribuirInput = z.infer<typeof reatribuirSchema>;

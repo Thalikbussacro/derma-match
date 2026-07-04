@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { adminAuthController } from '../controllers/admin-auth.controller.js';
 import { adminBiomedicaController } from '../controllers/admin-biomedica.controller.js';
+import { adminConversaController } from '../controllers/admin-conversa.controller.js';
 import { adminProdutoController } from '../controllers/admin-produto.controller.js';
 import { adminTipoPeleController } from '../controllers/admin-tipo-pele.controller.js';
 import { questionarioAdminController } from '../controllers/questionario-admin.controller.js';
@@ -57,3 +58,7 @@ adminRouter.post('/produtos', exigirAdmin, adminProdutoController.criar);
 adminRouter.patch('/produtos/:id', exigirAdmin, adminProdutoController.atualizar);
 adminRouter.post('/produtos/associar', exigirAdmin, adminProdutoController.associar);
 adminRouter.post('/produtos/desassociar', exigirAdmin, adminProdutoController.desassociar);
+
+// Conversas (atribuição).
+adminRouter.get('/conversas', exigirAdmin, adminConversaController.listar);
+adminRouter.patch('/conversas/:id/biomedica', exigirAdmin, adminConversaController.reatribuir);

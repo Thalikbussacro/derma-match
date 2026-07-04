@@ -42,23 +42,31 @@ async function obterOuCriarConversa(
   if (usuario.plano !== 'PREMIUM') {
     throw new ForbiddenError('Recurso exclusivo do plano Premium.', 'PLANO_INSUFICIENTE');
   }
-  const biomedica = await biomedicaRepository.buscarAtiva();
+
+  // Já tem conversa: reaproveita com a biomédica atribuída a ela.
+  const existente = await conversaRepository.buscarDoUsuario(usuarioId);
+  if (existente) {
+    const biomedica = await biomedicaRepository.buscarPorId(existente.biomedicaId);
+    return { conversa: existente, biomedicaNome: biomedica?.nome ?? 'Biomédica' };
+  }
+
+  // Nova conversa: atribui à biomédica ativa de menor carga.
+  const biomedica = await biomedicaRepository.buscarComMenorCarga();
   if (!biomedica) {
     throw new NotFoundError('Biomédica');
   }
-  let conversa = await conversaRepository.buscarDoUsuario(usuarioId);
-  if (!conversa) {
-    try {
-      conversa = await conversaRepository.criar(usuarioId, biomedica.id);
-    } catch (err) {
-      // Corrida (violação do unique usuário+biomédica): reaproveita a conversa criada em paralelo.
-      conversa = await conversaRepository.buscarDoUsuario(usuarioId);
-      if (!conversa) {
-        throw err;
-      }
+  try {
+    const conversa = await conversaRepository.criar(usuarioId, biomedica.id);
+    return { conversa, biomedicaNome: biomedica.nome };
+  } catch (err) {
+    // Corrida (violação do unique por usuária): reaproveita a conversa criada em paralelo.
+    const conversa = await conversaRepository.buscarDoUsuario(usuarioId);
+    if (!conversa) {
+      throw err;
     }
+    const dela = await biomedicaRepository.buscarPorId(conversa.biomedicaId);
+    return { conversa, biomedicaNome: dela?.nome ?? 'Biomédica' };
   }
-  return { conversa, biomedicaNome: biomedica.nome };
 }
 
 export const conversaService = {

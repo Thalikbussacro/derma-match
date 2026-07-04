@@ -44,6 +44,7 @@ export function AdminLayout() {
               { to: '/admin/questionario', label: 'Questionário', end: false },
               { to: '/admin/tipos-pele', label: 'Tipos de pele', end: false },
               { to: '/admin/produtos', label: 'Produtos', end: false },
+              { to: '/admin/conversas', label: 'Conversas', end: false },
             ].map((item) => (
               <NavLink
                 key={item.to}

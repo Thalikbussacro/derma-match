@@ -41,4 +41,20 @@ export const conversaRepository = {
     });
     return resultado.count;
   },
+
+  // Admin: todas as conversas com usuária, biomédica atribuída e nº de mensagens.
+  listarTodas() {
+    return prisma.conversa.findMany({
+      orderBy: { ultimaAtividade: 'desc' },
+      include: {
+        usuario: { select: { nome: true } },
+        biomedica: { select: { id: true, nome: true } },
+        _count: { select: { mensagens: true } },
+      },
+    });
+  },
+
+  reatribuir(conversaId: number, biomedicaId: number) {
+    return prisma.conversa.update({ where: { id: conversaId }, data: { biomedicaId } });
+  },
 };

@@ -11,9 +11,12 @@ export {
   criarProdutoSchema,
   criarTipoPeleSchema,
   definirPesoSchema,
+  reatribuirSchema,
 } from '@derma-match/shared';
 export type {
   AssociarProdutoInput,
+  ConversaAdmin,
+  ReatribuirInput,
   AtualizarOpcaoInput,
   AtualizarPerguntaInput,
   AtualizarProdutoInput,
