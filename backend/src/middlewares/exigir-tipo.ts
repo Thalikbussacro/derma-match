@@ -17,3 +17,4 @@ function exigirTipo(tipo: TipoUsuario) {
 
 export const exigirUsuaria = exigirTipo('USUARIA');
 export const exigirBiomedica = exigirTipo('BIOMEDICA');
+export const exigirAdmin = exigirTipo('ADMIN');

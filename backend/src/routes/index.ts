@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { exigirUsuaria } from '../middlewares/exigir-tipo.js';
+import { adminRouter } from './admin.routes.js';
 import { anexoRouter } from './anexo.routes.js';
 import { assinaturaRouter } from './assinatura.routes.js';
 import { authRouter } from './auth.routes.js';
@@ -16,6 +17,7 @@ export const router = Router();
 router.use(healthRouter);
 router.use('/auth', authRouter);
 router.use('/biomedica', biomedicaRouter);
+router.use('/admin', adminRouter);
 
 // Rotas da usuária: exigem token do tipo USUARIA (biomédica não acessa).
 router.use('/me', exigirUsuaria, contaRouter);

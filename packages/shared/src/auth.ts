@@ -56,3 +56,10 @@ export const biomedicaResponseSchema = z.object({
   email: z.string(),
 });
 export type BiomedicaResponse = z.infer<typeof biomedicaResponseSchema>;
+
+export const adminResponseSchema = z.object({
+  id: z.number(),
+  nome: z.string(),
+  email: z.string(),
+});
+export type AdminResponse = z.infer<typeof adminResponseSchema>;

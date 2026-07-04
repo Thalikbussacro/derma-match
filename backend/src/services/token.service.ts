@@ -4,7 +4,7 @@ import { z } from 'zod';
 import type { Plano } from '@prisma/client';
 import { env } from '../config/env.js';
 
-export const TIPOS_USUARIO = ['USUARIA', 'BIOMEDICA'] as const;
+export const TIPOS_USUARIO = ['USUARIA', 'BIOMEDICA', 'ADMIN'] as const;
 export type TipoUsuario = (typeof TIPOS_USUARIO)[number];
 
 const accessPayloadSchema = z.object({

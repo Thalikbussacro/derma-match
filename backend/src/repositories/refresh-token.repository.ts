@@ -2,10 +2,11 @@ import type { RefreshToken } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 
 export const refreshTokenRepository = {
-  // O dono é usuária XOR biomédica (garantido por check constraint no banco).
+  // O dono é exatamente um entre usuária, biomédica e admin (check constraint no banco).
   criar(data: {
     usuarioId?: number | null;
     biomedicaId?: number | null;
+    adminId?: number | null;
     tokenHash: string;
     expiraEm: Date;
   }): Promise<RefreshToken> {
@@ -34,6 +35,14 @@ export const refreshTokenRepository = {
   async revogarTodosDaBiomedica(biomedicaId: number): Promise<number> {
     const resultado = await prisma.refreshToken.updateMany({
       where: { biomedicaId, revogadoEm: null },
+      data: { revogadoEm: new Date() },
+    });
+    return resultado.count;
+  },
+
+  async revogarTodosDoAdmin(adminId: number): Promise<number> {
+    const resultado = await prisma.refreshToken.updateMany({
+      where: { adminId, revogadoEm: null },
       data: { revogadoEm: new Date() },
     });
     return resultado.count;
