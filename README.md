@@ -12,7 +12,7 @@ Monorepo **pnpm** com três pacotes:
 
 **Stack:** Node 22 · TypeScript strict · Express 5 · Prisma 6 / PostgreSQL 16 · Zod · JWT + bcrypt · Vitest · React 19 · Tailwind CSS.
 
-**Estado:** MVP + Premium + plataforma clínica configurável concluídos — backend (Fases 0–4), frontend (F0–F4), Premium (P1–P8) e plataforma configurável (Fase 6: painel de admin, questionário versionado, espectro de tipos de pele, catálogo de produtos, atribuição de conversas e rotina personalizada por paciente).
+**Estado:** MVP + Premium + plataforma clínica configurável + acompanhamento contínuo concluídos — backend (Fases 0–4), frontend (F0–F4), Premium (P1–P8), plataforma configurável (Fase 6: painel de admin, questionário versionado, espectro de tipos de pele, catálogo de produtos, atribuição de conversas e rotina personalizada por paciente) e acompanhamento (Fase 7: diário de pele, adesão à rotina, metas e conteúdo educativo).
 
 ## Pré-requisitos
 
