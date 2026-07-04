@@ -25,6 +25,7 @@ import { RequireAdmin } from './components/admin/RequireAdmin';
 import { AdminAuthProvider } from './features/admin/AdminAuthProvider';
 import { AdminBiomedicasPage } from './pages/admin/AdminBiomedicasPage';
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
+import { AdminQuestionarioPage } from './pages/admin/AdminQuestionarioPage';
 
 export default function App() {
   return (
@@ -148,6 +149,14 @@ export default function App() {
             element={
               <RequireAdmin>
                 <AdminBiomedicasPage />
+              </RequireAdmin>
+            }
+          />
+          <Route
+            path="questionario"
+            element={
+              <RequireAdmin>
+                <AdminQuestionarioPage />
               </RequireAdmin>
             }
           />

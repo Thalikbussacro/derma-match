@@ -39,17 +39,23 @@ export function AdminLayout() {
         </div>
         {admin && (
           <nav className="mx-auto flex max-w-3xl gap-1 px-3">
-            <NavLink
-              to="/admin"
-              end
-              className={({ isActive }) =>
-                `rounded-t-lg px-3 py-2 text-sm font-bold transition-colors ${
-                  isActive ? 'bg-neutral-100 text-neutral-900' : 'text-white/70 hover:text-white'
-                }`
-              }
-            >
-              Biomédicas
-            </NavLink>
+            {[
+              { to: '/admin', label: 'Biomédicas', end: true },
+              { to: '/admin/questionario', label: 'Questionário', end: false },
+            ].map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={({ isActive }) =>
+                  `rounded-t-lg px-3 py-2 text-sm font-bold transition-colors ${
+                    isActive ? 'bg-neutral-100 text-neutral-900' : 'text-white/70 hover:text-white'
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
           </nav>
         )}
       </header>

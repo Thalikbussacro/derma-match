@@ -1,3 +1,19 @@
 // Fonte única em @derma-match/shared (contrato compartilhado com o frontend).
-export { criarBiomedicaSchema } from '@derma-match/shared';
-export type { BiomedicaAdmin, CriarBiomedicaInput } from '@derma-match/shared';
+export {
+  atualizarOpcaoSchema,
+  atualizarPerguntaSchema,
+  criarBiomedicaSchema,
+  criarOpcaoSchema,
+  criarPerguntaSchema,
+  definirPesoSchema,
+} from '@derma-match/shared';
+export type {
+  AtualizarOpcaoInput,
+  AtualizarPerguntaInput,
+  BiomedicaAdmin,
+  CriarBiomedicaInput,
+  CriarOpcaoInput,
+  CriarPerguntaInput,
+  DefinirPesoInput,
+  QuestionarioRascunho,
+} from '@derma-match/shared';

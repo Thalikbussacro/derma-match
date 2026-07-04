@@ -27,3 +27,14 @@ export function useDefinirAtiva() {
     },
   });
 }
+
+const CHAVE_RASCUNHO = ['admin', 'rascunho'];
+
+export function useRascunho() {
+  return useQuery({ queryKey: CHAVE_RASCUNHO, queryFn: () => adminApi.rascunhoQuestionario() });
+}
+
+export function useInvalidarRascunho() {
+  const qc = useQueryClient();
+  return () => qc.invalidateQueries({ queryKey: CHAVE_RASCUNHO });
+}

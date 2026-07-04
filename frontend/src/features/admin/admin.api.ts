@@ -1,5 +1,14 @@
 import axios from 'axios';
-import type { AdminResponse, BiomedicaAdmin, CriarBiomedicaInput } from '@derma-match/shared';
+import type {
+  AdminResponse,
+  AtualizarPerguntaInput,
+  BiomedicaAdmin,
+  CriarBiomedicaInput,
+  CriarOpcaoInput,
+  CriarPerguntaInput,
+  DefinirPesoInput,
+  QuestionarioRascunho,
+} from '@derma-match/shared';
 import { apiAdmin } from '../../lib/apiAdmin';
 
 const API_BASE = import.meta.env.VITE_API_URL ?? '/api';
@@ -37,5 +46,35 @@ export const adminApi = {
   async definirAtiva(id: number, ativa: boolean): Promise<BiomedicaAdmin> {
     const res = await apiAdmin.patch<BiomedicaAdmin>(`/admin/biomedicas/${id}/ativa`, { ativa });
     return res.data;
+  },
+
+  // --- Questionário configurável (rascunho) ---
+  async rascunhoQuestionario(): Promise<QuestionarioRascunho> {
+    const res = await apiAdmin.get<QuestionarioRascunho>('/admin/questionario/rascunho');
+    return res.data;
+  },
+  async publicarQuestionario(): Promise<void> {
+    await apiAdmin.post('/admin/questionario/publicar');
+  },
+  async criarPergunta(input: CriarPerguntaInput): Promise<void> {
+    await apiAdmin.post('/admin/questionario/perguntas', input);
+  },
+  async atualizarPergunta(id: number, input: AtualizarPerguntaInput): Promise<void> {
+    await apiAdmin.patch(`/admin/questionario/perguntas/${id}`, input);
+  },
+  async removerPergunta(id: number): Promise<void> {
+    await apiAdmin.delete(`/admin/questionario/perguntas/${id}`);
+  },
+  async criarOpcao(input: CriarOpcaoInput): Promise<void> {
+    await apiAdmin.post('/admin/questionario/opcoes', input);
+  },
+  async atualizarOpcao(id: number, texto: string): Promise<void> {
+    await apiAdmin.patch(`/admin/questionario/opcoes/${id}`, { texto });
+  },
+  async removerOpcao(id: number): Promise<void> {
+    await apiAdmin.delete(`/admin/questionario/opcoes/${id}`);
+  },
+  async definirPeso(input: DefinirPesoInput): Promise<void> {
+    await apiAdmin.put('/admin/questionario/pesos', input);
   },
 };

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { adminAuthController } from '../controllers/admin-auth.controller.js';
 import { adminBiomedicaController } from '../controllers/admin-biomedica.controller.js';
+import { questionarioAdminController } from '../controllers/questionario-admin.controller.js';
 import { exigirAdmin } from '../middlewares/exigir-tipo.js';
 import { loginLimiter } from '../middlewares/rate-limit.js';
 
@@ -15,3 +16,30 @@ adminRouter.post('/logout', adminAuthController.logout);
 adminRouter.get('/biomedicas', exigirAdmin, adminBiomedicaController.listar);
 adminRouter.post('/biomedicas', exigirAdmin, adminBiomedicaController.criar);
 adminRouter.patch('/biomedicas/:id/ativa', exigirAdmin, adminBiomedicaController.definirAtiva);
+
+// Questionário configurável (sempre opera sobre o rascunho).
+adminRouter.get('/questionario/rascunho', exigirAdmin, questionarioAdminController.obterRascunho);
+adminRouter.post('/questionario/publicar', exigirAdmin, questionarioAdminController.publicar);
+adminRouter.post('/questionario/perguntas', exigirAdmin, questionarioAdminController.criarPergunta);
+adminRouter.patch(
+  '/questionario/perguntas/:id',
+  exigirAdmin,
+  questionarioAdminController.atualizarPergunta,
+);
+adminRouter.delete(
+  '/questionario/perguntas/:id',
+  exigirAdmin,
+  questionarioAdminController.removerPergunta,
+);
+adminRouter.post('/questionario/opcoes', exigirAdmin, questionarioAdminController.criarOpcao);
+adminRouter.patch(
+  '/questionario/opcoes/:id',
+  exigirAdmin,
+  questionarioAdminController.atualizarOpcao,
+);
+adminRouter.delete(
+  '/questionario/opcoes/:id',
+  exigirAdmin,
+  questionarioAdminController.removerOpcao,
+);
+adminRouter.put('/questionario/pesos', exigirAdmin, questionarioAdminController.definirPeso);

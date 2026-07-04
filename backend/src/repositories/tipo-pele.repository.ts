@@ -5,4 +5,8 @@ export const tipoPeleRepository = {
   buscarPorId(id: number): Promise<TipoPele | null> {
     return prisma.tipoPele.findUnique({ where: { id } });
   },
+
+  listar(): Promise<TipoPele[]> {
+    return prisma.tipoPele.findMany({ orderBy: { id: 'asc' } });
+  },
 };
