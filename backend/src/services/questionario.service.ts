@@ -1,6 +1,8 @@
+import type { Usuario } from '@prisma/client';
 import { NotFoundError, ValidationError } from '../errors/http-error.js';
 import { opcaoRespostaRepository } from '../repositories/opcao-resposta.repository.js';
 import { perguntaRepository } from '../repositories/pergunta.repository.js';
+import { questionarioVersaoRepository } from '../repositories/questionario-versao.repository.js';
 import { respostaUsuarioRepository } from '../repositories/resposta-usuario.repository.js';
 import { tipoPeleRepository } from '../repositories/tipo-pele.repository.js';
 import { usuarioRepository } from '../repositories/usuario.repository.js';
@@ -10,15 +12,28 @@ import type {
   ResponderPerguntaInput,
 } from '../schemas/questionario.schema.js';
 
+// Versão que a usuária está respondendo: a fixada na sessão dela, ou a publicada (se ainda não começou).
+async function versaoAtivaId(usuario: Usuario): Promise<number> {
+  if (usuario.questionarioVersaoId !== null) {
+    return usuario.questionarioVersaoId;
+  }
+  const publicada = await questionarioVersaoRepository.buscarPublicada();
+  if (!publicada) {
+    throw new NotFoundError('Questionário publicado');
+  }
+  return publicada.id;
+}
+
 async function obterEstado(usuarioId: number): Promise<EstadoQuestionarioResponse> {
   const usuario = await usuarioRepository.buscarPorId(usuarioId);
   if (!usuario) {
     throw new NotFoundError('Usuário');
   }
+  const versaoId = await versaoAtivaId(usuario);
 
   const [perguntasRespondidas, totalPerguntas] = await Promise.all([
     respostaUsuarioRepository.contarPorUsuario(usuarioId),
-    perguntaRepository.contar(),
+    perguntaRepository.contar(versaoId),
   ]);
 
   let estado: EstadoQuestionarioResponse['estado'];
@@ -39,7 +54,12 @@ async function obterEstado(usuarioId: number): Promise<EstadoQuestionarioRespons
 }
 
 async function obterProximaPergunta(usuarioId: number): Promise<PerguntaResponse | null> {
-  const perguntas = await perguntaRepository.listarOrdenadas();
+  const usuario = await usuarioRepository.buscarPorId(usuarioId);
+  if (!usuario) {
+    throw new NotFoundError('Usuário');
+  }
+  const versaoId = await versaoAtivaId(usuario);
+  const perguntas = await perguntaRepository.listarOrdenadas(versaoId);
   const respostas = await respostaUsuarioRepository.listarPorUsuario(usuarioId);
 
   const perguntasRespondidas = new Set(respostas.map((r) => r.perguntaId));
@@ -65,6 +85,23 @@ async function obterProximaPergunta(usuarioId: number): Promise<PerguntaResponse
 }
 
 async function responder(usuarioId: number, input: ResponderPerguntaInput): Promise<void> {
+  const usuario = await usuarioRepository.buscarPorId(usuarioId);
+  if (!usuario) {
+    throw new NotFoundError('Usuário');
+  }
+
+  // Fixa a versão na primeira resposta: a sessão fica presa à versão iniciada, mesmo que uma nova
+  // seja publicada no meio (não corrompe o cálculo). Ver ADR-0016.
+  if (usuario.questionarioVersaoId === null) {
+    const publicada = await questionarioVersaoRepository.buscarPublicada();
+    if (!publicada) {
+      throw new NotFoundError('Questionário publicado');
+    }
+    await usuarioRepository.atualizar(usuarioId, {
+      questionarioVersao: { connect: { id: publicada.id } },
+    });
+  }
+
   const opcao = await opcaoRespostaRepository.buscarPorId(input.opcaoId);
   if (!opcao) {
     throw new NotFoundError('Opção de resposta');
@@ -88,6 +125,13 @@ async function responder(usuarioId: number, input: ResponderPerguntaInput): Prom
 
 async function refazer(usuarioId: number): Promise<void> {
   await respostaUsuarioRepository.refazerQuestionario(usuarioId);
+  // Ao refazer, a usuária passa a responder a versão publicada atual.
+  const publicada = await questionarioVersaoRepository.buscarPublicada();
+  if (publicada) {
+    await usuarioRepository.atualizar(usuarioId, {
+      questionarioVersao: { connect: { id: publicada.id } },
+    });
+  }
 }
 
 // Vencedor: maior soma de pesos. Empate resolvido pelo menor tipoPeleId (RF-QUEST-011).

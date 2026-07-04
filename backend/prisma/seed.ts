@@ -269,6 +269,12 @@ async function seedTiposPele(): Promise<Map<TipoNome, number>> {
 }
 
 async function seedQuestionario(tiposPeleIds: Map<TipoNome, number>): Promise<void> {
+  // Versão 1 publicada — dona do conteúdo do seed (ADR-0016).
+  const versao = await prisma.questionarioVersao.upsert({
+    where: { numero: 1 },
+    update: { status: 'PUBLICADO' },
+    create: { numero: 1, status: 'PUBLICADO', publicadoEm: new Date() },
+  });
   // Apagar e recriar (aceitável em seed). O cascade remove opções, pesos e respostas.
   await prisma.pergunta.deleteMany();
 
@@ -291,7 +297,12 @@ async function seedQuestionario(tiposPeleIds: Map<TipoNome, number>): Promise<vo
     }
 
     const pergunta = await prisma.pergunta.create({
-      data: { texto: perguntaDef.texto, ordem: perguntaDef.ordem, dependeDeOpcaoId },
+      data: {
+        questionarioVersaoId: versao.id,
+        texto: perguntaDef.texto,
+        ordem: perguntaDef.ordem,
+        dependeDeOpcaoId,
+      },
     });
 
     for (const opcaoDef of perguntaDef.opcoes) {
