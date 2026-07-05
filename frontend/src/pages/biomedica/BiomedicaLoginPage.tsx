@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { OutrosAcessos } from '../../components/OutrosAcessos';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
@@ -67,6 +68,8 @@ export function BiomedicaLoginPage() {
           </Button>
         </form>
       </Card>
+
+      <OutrosAcessos atual="biomedica" />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { loginSchema, type LoginForm } from '../features/auth/auth.schemas';
 import { useAuth } from '../features/auth/authContext';
 import { mensagemDeErro } from '../lib/erros';
+import { OutrosAcessos } from '../components/OutrosAcessos';
 import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
@@ -77,6 +78,8 @@ export function LoginPage() {
           </Link>
         </span>
       </div>
+
+      <OutrosAcessos atual="usuaria" />
     </div>
   );
 }
