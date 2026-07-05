@@ -1,9 +1,9 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AppLayout } from './components/AppLayout';
+import { Inicio } from './components/Inicio';
 import { RedirectIfAuth } from './components/RedirectIfAuth';
 import { RequireAuth } from './components/RequireAuth';
 import { CadastroPage } from './pages/CadastroPage';
-import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { NotFound } from './pages/NotFound';
 import { PrivacidadePage } from './pages/PrivacidadePage';
@@ -60,15 +60,10 @@ export default function App() {
           <Route path="/redefinir-senha" element={<RedefinirSenhaPage />} />
           <Route path="/privacidade" element={<PrivacidadePage />} />
 
+          {/* Raiz: landing pública quando deslogada, dashboard quando logada. */}
+          <Route path="/" element={<Inicio />} />
+
           {/* Privadas */}
-          <Route
-            path="/"
-            element={
-              <RequireAuth>
-                <HomePage />
-              </RequireAuth>
-            }
-          />
           <Route
             path="/questionario"
             element={
