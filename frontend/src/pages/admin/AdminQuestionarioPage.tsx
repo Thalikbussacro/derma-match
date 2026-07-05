@@ -9,6 +9,7 @@ import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { Spinner } from '../../components/ui/Spinner';
+import { IconChevron } from '../../components/ui/icons';
 import { adminApi } from '../../features/admin/admin.api';
 import { useInvalidarRascunho, useProdutos, useRascunho } from '../../features/admin/useAdmin';
 import { mensagemDeErro } from '../../lib/erros';
@@ -139,6 +140,7 @@ function PerguntaEditor({
   produtos: ProdutoAdmin[];
   executar: Executar;
 }) {
+  const [aberta, setAberta] = useState(false);
   const [texto, setTexto] = useState(pergunta.texto);
   const [ordem, setOrdem] = useState(String(pergunta.ordem));
   const [novaOpcao, setNovaOpcao] = useState('');
@@ -151,57 +153,86 @@ function PerguntaEditor({
   }
 
   return (
-    <Card className="flex flex-col gap-3">
-      <div className="flex items-start gap-2">
-        <span className="mt-2 text-xs font-bold text-neutral-400">#{pergunta.id}</span>
-        <textarea
-          value={texto}
-          onChange={(e) => setTexto(e.target.value)}
-          rows={2}
-          className={`flex-1 resize-none ${inputBase}`}
+    <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+      <button
+        type="button"
+        onClick={() => setAberta((v) => !v)}
+        aria-expanded={aberta}
+        className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-50"
+      >
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-sm font-bold text-brand-700">
+          {pergunta.ordem}
+        </span>
+        <span className="min-w-0 flex-1 truncate font-bold text-neutral-800">{pergunta.texto}</span>
+        <span className="hidden shrink-0 text-xs text-neutral-400 sm:block">
+          {pergunta.opcoes.length} {pergunta.opcoes.length === 1 ? 'opção' : 'opções'}
+        </span>
+        <IconChevron
+          className={`h-4 w-4 shrink-0 text-neutral-400 transition-transform ${
+            aberta ? 'rotate-180' : ''
+          }`}
         />
-        <input
-          type="number"
-          min={1}
-          value={ordem}
-          onChange={(e) => setOrdem(e.target.value)}
-          title="Ordem"
-          className={`w-14 text-center ${inputBase}`}
-        />
-      </div>
-      <div className="flex gap-2">
-        <Button
-          variant="secondary"
-          onClick={() =>
-            void executar(() =>
-              adminApi.atualizarPergunta(pergunta.id, { texto, ordem: Number(ordem) }),
-            )
-          }
-        >
-          Salvar pergunta
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => void executar(() => adminApi.removerPergunta(pergunta.id))}
-        >
-          Remover pergunta
-        </Button>
-      </div>
-      <div className="flex flex-col gap-2">
-        {pergunta.opcoes.map((o) => (
-          <OpcaoEditor key={o.id} opcao={o} tipos={tipos} produtos={produtos} executar={executar} />
-        ))}
-      </div>
-      <div className="flex gap-2">
-        <input
-          value={novaOpcao}
-          onChange={(e) => setNovaOpcao(e.target.value)}
-          placeholder="Nova opção…"
-          className={`flex-1 ${inputBase}`}
-        />
-        <Button onClick={() => void adicionarOpcao()}>Adicionar opção</Button>
-      </div>
-    </Card>
+      </button>
+
+      {aberta && (
+        <div className="flex flex-col gap-3 border-t border-neutral-100 px-4 pb-4 pt-3">
+          <div className="flex items-start gap-2">
+            <textarea
+              value={texto}
+              onChange={(e) => setTexto(e.target.value)}
+              rows={2}
+              className={`flex-1 resize-none ${inputBase}`}
+            />
+            <input
+              type="number"
+              min={1}
+              value={ordem}
+              onChange={(e) => setOrdem(e.target.value)}
+              title="Ordem"
+              className={`w-14 text-center ${inputBase}`}
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              onClick={() =>
+                void executar(() =>
+                  adminApi.atualizarPergunta(pergunta.id, { texto, ordem: Number(ordem) }),
+                )
+              }
+            >
+              Salvar pergunta
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => void executar(() => adminApi.removerPergunta(pergunta.id))}
+            >
+              Remover pergunta
+            </Button>
+          </div>
+          <div className="flex flex-col gap-2">
+            {pergunta.opcoes.map((o) => (
+              <OpcaoEditor
+                key={o.id}
+                opcao={o}
+                tipos={tipos}
+                produtos={produtos}
+                executar={executar}
+              />
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <input
+              value={novaOpcao}
+              onChange={(e) => setNovaOpcao(e.target.value)}
+              placeholder="Nova opção…"
+              className={`flex-1 ${inputBase}`}
+            />
+            <Button onClick={() => void adicionarOpcao()}>Adicionar opção</Button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

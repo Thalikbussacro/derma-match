@@ -26,6 +26,14 @@ export function IconBack(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function IconChevron(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Base {...props}>
+      <polyline points="6 9 12 15 18 9" />
+    </Base>
+  );
+}
+
 export function IconHome(props: SVGProps<SVGSVGElement>) {
   return (
     <Base {...props}>
