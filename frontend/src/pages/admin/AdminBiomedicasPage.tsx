@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { criarBiomedicaSchema, type CriarBiomedicaInput } from '@derma-match/shared';
+import { Tabela, Td, Th } from '../../components/admin/Tabela';
 import { Alert } from '../../components/ui/Alert';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
@@ -45,21 +46,28 @@ export function AdminBiomedicasPage() {
         <form onSubmit={(e) => void aoCriar(e)} className="flex flex-col gap-3" noValidate>
           {erro && <Alert tipo="erro">{erro}</Alert>}
           {msg && <Alert tipo="sucesso">{msg}</Alert>}
-          <Input label="Nome" error={errors.nome?.message} {...register('nome')} />
-          <Input
-            label="Registro profissional"
-            error={errors.registro?.message}
-            {...register('registro')}
-          />
-          <Input label="Email" type="email" error={errors.email?.message} {...register('email')} />
-          <Input
-            label="Senha inicial"
-            type="password"
-            autoComplete="new-password"
-            error={errors.senha?.message}
-            {...register('senha')}
-          />
-          <Button type="submit" loading={criar.isPending}>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Input label="Nome" error={errors.nome?.message} {...register('nome')} />
+            <Input
+              label="Registro profissional"
+              error={errors.registro?.message}
+              {...register('registro')}
+            />
+            <Input
+              label="Email"
+              type="email"
+              error={errors.email?.message}
+              {...register('email')}
+            />
+            <Input
+              label="Senha inicial"
+              type="password"
+              autoComplete="new-password"
+              error={errors.senha?.message}
+              {...register('senha')}
+            />
+          </div>
+          <Button type="submit" className="self-start" loading={criar.isPending}>
             Cadastrar
           </Button>
         </form>
@@ -72,17 +80,26 @@ export function AdminBiomedicasPage() {
       ) : isError || !biomedicas ? (
         <Alert tipo="erro">Não foi possível carregar as biomédicas.</Alert>
       ) : (
-        <div className="flex flex-col gap-2.5">
+        <Tabela
+          cabecalho={
+            <>
+              <Th>Nome</Th>
+              <Th>Registro</Th>
+              <Th>Email</Th>
+              <Th>Status</Th>
+              <Th className="text-right">Ações</Th>
+            </>
+          }
+        >
           {biomedicas.map((b) => (
-            <Card key={b.id} className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="truncate font-bold text-neutral-800">{b.nome}</p>
-                <p className="truncate text-sm text-neutral-500">
-                  {b.registro} · {b.email}
-                </p>
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
+            <tr key={b.id} className="hover:bg-neutral-50">
+              <Td className="font-bold text-neutral-800">{b.nome}</Td>
+              <Td className="text-neutral-500">{b.registro}</Td>
+              <Td className="text-neutral-500">{b.email}</Td>
+              <Td>
                 <Badge tom={b.ativa ? 'brand' : 'neutral'}>{b.ativa ? 'ativa' : 'inativa'}</Badge>
+              </Td>
+              <Td className="text-right">
                 <Button
                   variant="secondary"
                   loading={definirAtiva.isPending}
@@ -90,10 +107,10 @@ export function AdminBiomedicasPage() {
                 >
                   {b.ativa ? 'Desativar' : 'Ativar'}
                 </Button>
-              </div>
-            </Card>
+              </Td>
+            </tr>
           ))}
-        </div>
+        </Tabela>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { Tabela, Td, Th } from '../../components/admin/Tabela';
 import { Alert } from '../../components/ui/Alert';
-import { Card } from '../../components/ui/Card';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { Spinner } from '../../components/ui/Spinner';
 import { IconChat } from '../../components/ui/icons';
@@ -56,15 +56,20 @@ export function AdminConversasPage() {
           descricao="As conversas aparecem aqui quando as pacientes começam a falar com a biomédica."
         />
       ) : (
-        <div className="flex flex-col gap-2.5">
+        <Tabela
+          cabecalho={
+            <>
+              <Th>Paciente</Th>
+              <Th>Mensagens</Th>
+              <Th>Biomédica responsável</Th>
+            </>
+          }
+        >
           {conversas.map((c) => (
-            <Card key={c.id} className="flex flex-wrap items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="truncate font-bold text-neutral-800">{c.usuarioNome}</p>
-                <p className="text-sm text-neutral-500">{c.mensagens} mensagem(ns)</p>
-              </div>
-              <label className="flex items-center gap-2 text-sm">
-                <span className="text-neutral-500">Biomédica</span>
+            <tr key={c.id} className="hover:bg-neutral-50">
+              <Td className="font-bold text-neutral-800">{c.usuarioNome}</Td>
+              <Td className="text-neutral-500">{c.mensagens}</Td>
+              <Td>
                 <select
                   value={c.biomedicaId}
                   onChange={(e) => void reatribuir(c.id, Number(e.target.value))}
@@ -79,10 +84,10 @@ export function AdminConversasPage() {
                     <option value={c.biomedicaId}>{c.biomedicaNome} (inativa)</option>
                   )}
                 </select>
-              </label>
-            </Card>
+              </Td>
+            </tr>
           ))}
-        </div>
+        </Tabela>
       )}
     </div>
   );

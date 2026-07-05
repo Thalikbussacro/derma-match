@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { ETAPAS, type Etapa, type ProdutoAdmin } from '@derma-match/shared';
+import { Tabela, Td, Th } from '../../components/admin/Tabela';
 import { Alert } from '../../components/ui/Alert';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
@@ -19,30 +20,52 @@ const ETAPA_LABEL: Record<Etapa, string> = {
 
 const inputBase =
   'rounded-lg border border-neutral-200 px-2 py-1.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-200';
+const acaoBtn = 'text-sm font-bold text-brand-600 transition-colors hover:text-brand-700';
 
 type Executar = (fn: () => Promise<void>) => Promise<boolean>;
 
-function ProdutoEditor({ produto, executar }: { produto: ProdutoAdmin; executar: Executar }) {
+function ProdutoEditor({
+  produto,
+  executar,
+  aoFechar,
+}: {
+  produto: ProdutoAdmin;
+  executar: Executar;
+  aoFechar: () => void;
+}) {
   const [nome, setNome] = useState(produto.nome);
   const [marca, setMarca] = useState(produto.marca ?? '');
   const [etapa, setEtapa] = useState<Etapa>(produto.etapa);
   const [descricao, setDescricao] = useState(produto.descricao);
+
+  async function salvar() {
+    const ok = await executar(() =>
+      adminApi.atualizarProduto(produto.id, {
+        nome,
+        marca: marca.trim() || null,
+        etapa,
+        descricao,
+      }),
+    );
+    if (ok) {
+      aoFechar();
+    }
+  }
+
   return (
-    <Card className="flex flex-col gap-2">
-      <div className="flex items-center gap-2">
+    <div className="flex flex-col gap-2">
+      <div className="grid gap-2 sm:grid-cols-3">
         <input
           value={nome}
           onChange={(e) => setNome(e.target.value)}
-          className={`flex-1 ${inputBase}`}
+          placeholder="Nome"
+          className={inputBase}
         />
-        {!produto.ativo && <Badge tom="neutral">inativo</Badge>}
-      </div>
-      <div className="flex gap-2">
         <input
           value={marca}
           onChange={(e) => setMarca(e.target.value)}
           placeholder="Marca"
-          className={`flex-1 ${inputBase}`}
+          className={inputBase}
         />
         <select
           value={etapa}
@@ -63,31 +86,14 @@ function ProdutoEditor({ produto, executar }: { produto: ProdutoAdmin; executar:
         className={`resize-none ${inputBase}`}
       />
       <div className="flex gap-2">
-        <Button
-          variant="secondary"
-          onClick={() =>
-            void executar(() =>
-              adminApi.atualizarProduto(produto.id, {
-                nome,
-                marca: marca.trim() || null,
-                etapa,
-                descricao,
-              }),
-            )
-          }
-        >
+        <Button variant="secondary" onClick={() => void salvar()}>
           Salvar
         </Button>
-        <Button
-          variant="ghost"
-          onClick={() =>
-            void executar(() => adminApi.atualizarProduto(produto.id, { ativo: !produto.ativo }))
-          }
-        >
-          {produto.ativo ? 'Desativar' : 'Ativar'}
+        <Button variant="ghost" onClick={aoFechar}>
+          Cancelar
         </Button>
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -95,6 +101,7 @@ export function AdminProdutosPage() {
   const { data: produtos, isLoading, isError } = useProdutos();
   const invalidar = useInvalidarProdutos();
   const [erro, setErro] = useState<string | null>(null);
+  const [editando, setEditando] = useState<number | null>(null);
   const [nome, setNome] = useState('');
   const [marca, setMarca] = useState('');
   const [etapa, setEtapa] = useState<Etapa>('LIMPEZA');
@@ -150,18 +157,18 @@ export function AdminProdutosPage() {
       <Card>
         <h2 className="mb-3 font-extrabold text-neutral-800">Novo produto</h2>
         <div className="flex flex-col gap-2">
-          <input
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            placeholder="Nome"
-            className={inputBase}
-          />
-          <div className="flex gap-2">
+          <div className="grid gap-2 sm:grid-cols-3">
+            <input
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              placeholder="Nome"
+              className={inputBase}
+            />
             <input
               value={marca}
               onChange={(e) => setMarca(e.target.value)}
               placeholder="Marca (opcional)"
-              className={`flex-1 ${inputBase}`}
+              className={inputBase}
             />
             <select
               value={etapa}
@@ -188,9 +195,61 @@ export function AdminProdutosPage() {
         </div>
       </Card>
 
-      {produtos.map((p) => (
-        <ProdutoEditor key={p.id} produto={p} executar={executar} />
-      ))}
+      <Tabela
+        cabecalho={
+          <>
+            <Th>Nome</Th>
+            <Th>Marca</Th>
+            <Th>Etapa</Th>
+            <Th>Status</Th>
+            <Th className="text-right">Ações</Th>
+          </>
+        }
+      >
+        {produtos.map((p) => (
+          <Fragment key={p.id}>
+            <tr className="hover:bg-neutral-50">
+              <Td className="font-bold text-neutral-800">{p.nome}</Td>
+              <Td className="text-neutral-500">{p.marca ?? '—'}</Td>
+              <Td className="text-neutral-500">{ETAPA_LABEL[p.etapa]}</Td>
+              <Td>
+                <Badge tom={p.ativo ? 'brand' : 'neutral'}>{p.ativo ? 'ativo' : 'inativo'}</Badge>
+              </Td>
+              <Td>
+                <div className="flex justify-end gap-3 whitespace-nowrap">
+                  <button
+                    type="button"
+                    className={acaoBtn}
+                    onClick={() => setEditando(editando === p.id ? null : p.id)}
+                  >
+                    {editando === p.id ? 'Fechar' : 'Editar'}
+                  </button>
+                  <button
+                    type="button"
+                    className={acaoBtn}
+                    onClick={() =>
+                      void executar(() => adminApi.atualizarProduto(p.id, { ativo: !p.ativo }))
+                    }
+                  >
+                    {p.ativo ? 'Desativar' : 'Ativar'}
+                  </button>
+                </div>
+              </Td>
+            </tr>
+            {editando === p.id && (
+              <tr className="bg-neutral-50">
+                <td colSpan={5} className="px-4 py-4">
+                  <ProdutoEditor
+                    produto={p}
+                    executar={executar}
+                    aoFechar={() => setEditando(null)}
+                  />
+                </td>
+              </tr>
+            )}
+          </Fragment>
+        ))}
+      </Tabela>
     </div>
   );
 }

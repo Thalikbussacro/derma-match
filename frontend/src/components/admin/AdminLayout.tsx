@@ -21,7 +21,7 @@ export function AdminLayout() {
     <div className="flex min-h-screen flex-col bg-neutral-100">
       {/* Cabeçalho escuro — deixa claro que é a área administrativa (distinta de usuária e biomédica). */}
       <header className="bg-neutral-900 text-white shadow-sm">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-2 px-4 py-3">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-3">
           <div className="leading-tight">
             <p className="text-sm font-extrabold">Painel do administrador</p>
             {admin && <p className="text-xs text-white/60">{admin.email}</p>}
@@ -38,7 +38,7 @@ export function AdminLayout() {
           )}
         </div>
         {admin && (
-          <nav className="mx-auto flex max-w-3xl gap-1 overflow-x-auto px-3">
+          <nav className="mx-auto flex max-w-5xl gap-1 overflow-x-auto px-3">
             {[
               { to: '/admin', label: 'Painel', end: true },
               { to: '/admin/biomedicas', label: 'Biomédicas', end: false },
@@ -65,7 +65,7 @@ export function AdminLayout() {
         )}
       </header>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
         <Outlet />
       </main>
     </div>

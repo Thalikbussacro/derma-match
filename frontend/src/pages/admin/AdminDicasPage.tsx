@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import type { DicaAdmin } from '@derma-match/shared';
+import { Tabela, Td, Th } from '../../components/admin/Tabela';
 import { Alert } from '../../components/ui/Alert';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
@@ -11,45 +12,47 @@ import { mensagemDeErro } from '../../lib/erros';
 
 const inputBase =
   'rounded-lg border border-neutral-200 px-2 py-1.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-200';
+const acaoBtn = 'text-sm font-bold text-brand-600 transition-colors hover:text-brand-700';
 
 type Executar = (fn: () => Promise<void>) => Promise<boolean>;
 
-function DicaEditor({ dica, executar }: { dica: DicaAdmin; executar: Executar }) {
+function DicaEditor({
+  dica,
+  executar,
+  aoFechar,
+}: {
+  dica: DicaAdmin;
+  executar: Executar;
+  aoFechar: () => void;
+}) {
   const [titulo, setTitulo] = useState(dica.titulo);
   const [conteudo, setConteudo] = useState(dica.conteudo);
+
+  async function salvar() {
+    const ok = await executar(() => adminApi.atualizarDica(dica.id, { titulo, conteudo }));
+    if (ok) {
+      aoFechar();
+    }
+  }
+
   return (
-    <Card className="flex flex-col gap-2">
-      <div className="flex items-center gap-2">
-        <input
-          value={titulo}
-          onChange={(e) => setTitulo(e.target.value)}
-          className={`flex-1 ${inputBase}`}
-        />
-        {!dica.ativa && <Badge tom="neutral">inativa</Badge>}
-      </div>
+    <div className="flex flex-col gap-2">
+      <input value={titulo} onChange={(e) => setTitulo(e.target.value)} className={inputBase} />
       <textarea
         value={conteudo}
         onChange={(e) => setConteudo(e.target.value)}
-        rows={2}
+        rows={3}
         className={`resize-none ${inputBase}`}
       />
       <div className="flex gap-2">
-        <Button
-          variant="secondary"
-          onClick={() => void executar(() => adminApi.atualizarDica(dica.id, { titulo, conteudo }))}
-        >
+        <Button variant="secondary" onClick={() => void salvar()}>
           Salvar
         </Button>
-        <Button
-          variant="ghost"
-          onClick={() =>
-            void executar(() => adminApi.atualizarDica(dica.id, { ativa: !dica.ativa }))
-          }
-        >
-          {dica.ativa ? 'Desativar' : 'Ativar'}
+        <Button variant="ghost" onClick={aoFechar}>
+          Cancelar
         </Button>
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -57,6 +60,7 @@ export function AdminDicasPage() {
   const { data: dicas, isLoading, isError } = useDicasAdmin();
   const invalidar = useInvalidarDicas();
   const [erro, setErro] = useState<string | null>(null);
+  const [editando, setEditando] = useState<number | null>(null);
   const [titulo, setTitulo] = useState('');
   const [conteudo, setConteudo] = useState('');
 
@@ -126,9 +130,53 @@ export function AdminDicasPage() {
         </div>
       </Card>
 
-      {dicas.map((d) => (
-        <DicaEditor key={d.id} dica={d} executar={executar} />
-      ))}
+      <Tabela
+        cabecalho={
+          <>
+            <Th>Título</Th>
+            <Th>Status</Th>
+            <Th className="text-right">Ações</Th>
+          </>
+        }
+      >
+        {dicas.map((d) => (
+          <Fragment key={d.id}>
+            <tr className="hover:bg-neutral-50">
+              <Td className="font-bold text-neutral-800">{d.titulo}</Td>
+              <Td>
+                <Badge tom={d.ativa ? 'brand' : 'neutral'}>{d.ativa ? 'ativa' : 'inativa'}</Badge>
+              </Td>
+              <Td>
+                <div className="flex justify-end gap-3 whitespace-nowrap">
+                  <button
+                    type="button"
+                    className={acaoBtn}
+                    onClick={() => setEditando(editando === d.id ? null : d.id)}
+                  >
+                    {editando === d.id ? 'Fechar' : 'Editar'}
+                  </button>
+                  <button
+                    type="button"
+                    className={acaoBtn}
+                    onClick={() =>
+                      void executar(() => adminApi.atualizarDica(d.id, { ativa: !d.ativa }))
+                    }
+                  >
+                    {d.ativa ? 'Desativar' : 'Ativar'}
+                  </button>
+                </div>
+              </Td>
+            </tr>
+            {editando === d.id && (
+              <tr className="bg-neutral-50">
+                <td colSpan={3} className="px-4 py-4">
+                  <DicaEditor dica={d} executar={executar} aoFechar={() => setEditando(null)} />
+                </td>
+              </tr>
+            )}
+          </Fragment>
+        ))}
+      </Tabela>
     </div>
   );
 }

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import type { TipoPeleAdmin } from '@derma-match/shared';
+import { Tabela, Td, Th } from '../../components/admin/Tabela';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
@@ -10,23 +11,41 @@ import { mensagemDeErro } from '../../lib/erros';
 
 const inputBase =
   'rounded-lg border border-neutral-200 px-2 py-1.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-200';
+const acaoBtn = 'text-sm font-bold text-brand-600 transition-colors hover:text-brand-700';
 
 type Executar = (fn: () => Promise<void>) => Promise<boolean>;
 
-function TipoEditor({ tipo, executar }: { tipo: TipoPeleAdmin; executar: Executar }) {
+function TipoEditor({
+  tipo,
+  executar,
+  aoFechar,
+}: {
+  tipo: TipoPeleAdmin;
+  executar: Executar;
+  aoFechar: () => void;
+}) {
   const [nome, setNome] = useState(tipo.nome);
   const [descricao, setDescricao] = useState(tipo.descricao);
   const [ordem, setOrdem] = useState(String(tipo.ordem));
+
+  async function salvar() {
+    const ok = await executar(() =>
+      adminApi.atualizarTipoPele(tipo.id, { nome, descricao, ordem: Number(ordem) }),
+    );
+    if (ok) {
+      aoFechar();
+    }
+  }
+
   return (
-    <Card className="flex flex-col gap-2">
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-bold text-neutral-400">Ordem</span>
+    <div className="flex flex-col gap-2">
+      <div className="flex gap-2">
         <input
           type="number"
           min={0}
           value={ordem}
           onChange={(e) => setOrdem(e.target.value)}
-          className={`w-14 text-center ${inputBase}`}
+          className={`w-16 text-center ${inputBase}`}
         />
         <input
           value={nome}
@@ -40,18 +59,15 @@ function TipoEditor({ tipo, executar }: { tipo: TipoPeleAdmin; executar: Executa
         rows={2}
         className={`resize-none ${inputBase}`}
       />
-      <Button
-        variant="secondary"
-        className="self-start"
-        onClick={() =>
-          void executar(() =>
-            adminApi.atualizarTipoPele(tipo.id, { nome, descricao, ordem: Number(ordem) }),
-          )
-        }
-      >
-        Salvar
-      </Button>
-    </Card>
+      <div className="flex gap-2">
+        <Button variant="secondary" onClick={() => void salvar()}>
+          Salvar
+        </Button>
+        <Button variant="ghost" onClick={aoFechar}>
+          Cancelar
+        </Button>
+      </div>
+    </div>
   );
 }
 
@@ -59,6 +75,7 @@ export function AdminTiposPelePage() {
   const { data: tipos, isLoading, isError } = useTiposPele();
   const invalidar = useInvalidarTipos();
   const [erro, setErro] = useState<string | null>(null);
+  const [editando, setEditando] = useState<number | null>(null);
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
   const [ordem, setOrdem] = useState('');
@@ -143,9 +160,42 @@ export function AdminTiposPelePage() {
         </div>
       </Card>
 
-      {tipos.map((t) => (
-        <TipoEditor key={t.id} tipo={t} executar={executar} />
-      ))}
+      <Tabela
+        cabecalho={
+          <>
+            <Th className="w-20">Ordem</Th>
+            <Th>Nome</Th>
+            <Th>Descrição</Th>
+            <Th className="text-right">Ações</Th>
+          </>
+        }
+      >
+        {tipos.map((t) => (
+          <Fragment key={t.id}>
+            <tr className="hover:bg-neutral-50">
+              <Td className="text-center font-bold text-neutral-500">{t.ordem}</Td>
+              <Td className="font-bold capitalize text-neutral-800">{t.nome}</Td>
+              <Td className="max-w-md truncate text-neutral-500">{t.descricao}</Td>
+              <Td className="text-right">
+                <button
+                  type="button"
+                  className={acaoBtn}
+                  onClick={() => setEditando(editando === t.id ? null : t.id)}
+                >
+                  {editando === t.id ? 'Fechar' : 'Editar'}
+                </button>
+              </Td>
+            </tr>
+            {editando === t.id && (
+              <tr className="bg-neutral-50">
+                <td colSpan={4} className="px-4 py-4">
+                  <TipoEditor tipo={t} executar={executar} aoFechar={() => setEditando(null)} />
+                </td>
+              </tr>
+            )}
+          </Fragment>
+        ))}
+      </Tabela>
     </div>
   );
 }
