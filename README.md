@@ -129,6 +129,17 @@ diretório. Os nomes são `derma-match` (backend), `derma-match-frontend` (front
 - **Testes manuais de rota:** ficam em `backend/.http/` (fora do versionamento) e usam a extensão
   REST Client do VS Code; `fluxo-completo.http` cobre a jornada ponta a ponta.
 
+## Deploy
+
+Dá pra subir tudo de graça no Render: um serviço só serve a API e o frontend juntos — na mesma
+origem, então o cookie de sessão funciona sem dor de cabeça — com o Postgres ao lado. O `render.yaml`
+na raiz já descreve esses recursos; no painel do Render é **New → Blueprint**, apontar para o
+repositório e aplicar. Os segredos (JWT) e a `DATABASE_URL` o próprio Render preenche.
+
+Dois avisos do plano grátis: o serviço **dorme depois de ~15 min** parado (a primeira visita seguinte
+leva ~50s para acordar) e o **Postgres grátis do Render expira em 30 dias**. Para manter o banco no ar
+por mais tempo, basta trocar a `DATABASE_URL` por um banco do Neon (grátis e sem expiração).
+
 ## Documentação interna
 
 As decisões de arquitetura, as convenções de código, os requisitos e o planejamento por fases foram

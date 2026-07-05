@@ -1,0 +1,43 @@
+# Blueprint de deploy no Render: um Web Service (API + frontend embutido) e um Postgres.
+# No painel do Render: New > Blueprint, aponta para este repositório e aplica.
+
+databases:
+  - name: derma-match-db
+    databaseName: derma_match
+    user: derma
+    plan: free
+    postgresMajorVersion: "16"
+    region: oregon
+
+services:
+  - type: web
+    name: derma-match
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    # --prod=false garante as devDependencies (typescript, vite, tsx, prisma CLI) no build.
+    # pnpm -r builda na ordem topológica (shared antes de backend/frontend).
+    # migrate deploy + seed rodam uma vez por deploy, aqui no build (o seed é idempotente).
+    buildCommand: >-
+      pnpm install --frozen-lockfile --prod=false &&
+      pnpm -r build &&
+      pnpm --filter derma-match exec prisma migrate deploy &&
+      pnpm --filter derma-match exec prisma db seed
+    startCommand: pnpm --filter derma-match start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Atrás do proxy do Render: faz req.ip refletir o cliente real (base do rate limit).
+      - key: TRUST_PROXY
+        value: "1"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: derma-match-db
+          property: connectionString
+      # Gerados pelo Render no primeiro deploy (não ficam no repositório).
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true

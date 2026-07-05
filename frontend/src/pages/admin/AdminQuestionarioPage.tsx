@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type {
   ProdutoAdmin,
   RascunhoOpcao,
@@ -20,6 +20,22 @@ type Executar = (fn: () => Promise<void>) => Promise<boolean>;
 const inputBase =
   'rounded-lg border border-neutral-200 px-2 py-1.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-200';
 
+// Realça o botão de salvar quando há alteração pendente.
+const salvarRealce = 'ring-2 ring-brand-300 ring-offset-1';
+
+// Mostra "salvo com sucesso" por alguns segundos após gravar.
+function useSalvoFlash() {
+  const [salvo, setSalvo] = useState(false);
+  useEffect(() => {
+    if (!salvo) {
+      return;
+    }
+    const id = setTimeout(() => setSalvo(false), 2500);
+    return () => clearTimeout(id);
+  }, [salvo]);
+  return { salvo, marcarSalvo: () => setSalvo(true) };
+}
+
 function OpcaoEditor({
   opcao,
   tipos,
@@ -40,6 +56,14 @@ function OpcaoEditor({
     return inicial;
   });
   const sugerido = (produtoId: number) => opcao.produtosSugeridos.includes(produtoId);
+  const { salvo, marcarSalvo } = useSalvoFlash();
+
+  const modificada =
+    texto !== opcao.texto ||
+    tipos.some((t) => {
+      const atual = opcao.pesos.find((p) => p.tipoPeleId === t.id)?.peso ?? 0;
+      return Number(pesos[t.id]) !== atual;
+    });
 
   function toggleProduto(produtoId: number) {
     void executar(() =>
@@ -51,7 +75,7 @@ function OpcaoEditor({
 
   // Salva o texto e os pesos que mudaram, tudo de uma vez.
   async function salvar() {
-    await executar(async () => {
+    const ok = await executar(async () => {
       await adminApi.atualizarOpcao(opcao.id, texto);
       for (const t of tipos) {
         const n = Number(pesos[t.id]);
@@ -61,6 +85,9 @@ function OpcaoEditor({
         }
       }
     });
+    if (ok) {
+      marcarSalvo();
+    }
   }
 
   return (
@@ -71,7 +98,12 @@ function OpcaoEditor({
           onChange={(e) => setTexto(e.target.value)}
           className={`flex-1 ${inputBase}`}
         />
-        <Button variant="secondary" onClick={() => void salvar()}>
+        <Button
+          variant="primary"
+          disabled={!modificada}
+          className={modificada ? salvarRealce : ''}
+          onClick={() => void salvar()}
+        >
           Salvar
         </Button>
         <Button
@@ -113,7 +145,13 @@ function OpcaoEditor({
           ))}
         </div>
       )}
-      <p className="mt-2 text-xs text-neutral-400">Texto e pesos são gravados no botão “Salvar”.</p>
+      {salvo ? (
+        <p className="mt-2 text-xs font-bold text-brand-600">✓ Opção salva com sucesso.</p>
+      ) : (
+        <p className="mt-2 text-xs text-neutral-400">
+          Texto e pesos são gravados no botão “Salvar”.
+        </p>
+      )}
     </div>
   );
 }
@@ -133,11 +171,21 @@ function PerguntaEditor({
   const [texto, setTexto] = useState(pergunta.texto);
   const [ordem, setOrdem] = useState(String(pergunta.ordem));
   const [novaOpcao, setNovaOpcao] = useState('');
+  const { salvo, marcarSalvo } = useSalvoFlash();
+  const modificada = texto !== pergunta.texto || ordem !== String(pergunta.ordem);
 
   async function adicionarOpcao() {
     const t = novaOpcao.trim();
     if (t && (await executar(() => adminApi.criarOpcao({ perguntaId: pergunta.id, texto: t })))) {
       setNovaOpcao('');
+    }
+  }
+
+  async function salvarPergunta() {
+    if (
+      await executar(() => adminApi.atualizarPergunta(pergunta.id, { texto, ordem: Number(ordem) }))
+    ) {
+      marcarSalvo();
     }
   }
 
@@ -181,14 +229,12 @@ function PerguntaEditor({
               className={`w-14 text-center ${inputBase}`}
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <Button
-              variant="secondary"
-              onClick={() =>
-                void executar(() =>
-                  adminApi.atualizarPergunta(pergunta.id, { texto, ordem: Number(ordem) }),
-                )
-              }
+              variant="primary"
+              disabled={!modificada}
+              className={modificada ? salvarRealce : ''}
+              onClick={() => void salvarPergunta()}
             >
               Salvar pergunta
             </Button>
@@ -198,6 +244,7 @@ function PerguntaEditor({
             >
               Remover pergunta
             </Button>
+            {salvo && <span className="text-sm font-bold text-brand-600">✓ Salvo com sucesso</span>}
           </div>
           <div className="flex flex-col gap-2">
             {pergunta.opcoes.map((o) => (
