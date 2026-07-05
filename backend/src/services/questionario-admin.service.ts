@@ -181,7 +181,23 @@ export const questionarioAdminService = {
   async removerPergunta(id: number): Promise<void> {
     const rascunho = await garantirRascunho();
     await perguntaDoRascunho(id, rascunho.id);
-    await perguntaRepository.remover(id);
+    // Remove e renumera as restantes para 1..N (sem buracos na ordem).
+    await prisma.$transaction(async (tx) => {
+      await tx.pergunta.delete({ where: { id } });
+      const restantes = await tx.pergunta.findMany({
+        where: { questionarioVersaoId: rascunho.id },
+        orderBy: { ordem: 'asc' },
+        select: { id: true, ordem: true },
+      });
+      // Ascendente: cada nova ordem é <= a atual, então nunca colide com o índice único.
+      let novaOrdem = 1;
+      for (const p of restantes) {
+        if (p.ordem !== novaOrdem) {
+          await tx.pergunta.update({ where: { id: p.id }, data: { ordem: novaOrdem } });
+        }
+        novaOrdem += 1;
+      }
+    });
   },
 
   async criarOpcao(input: CriarOpcaoInput): Promise<void> {

@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import type { BiomedicaResponse } from '@derma-match/shared';
+import { CHAVE_SESSAO, limparSessao, marcarSessao, temSessao } from '../../lib/sessionHint';
 import { biomedicaApi } from './biomedica.api';
 import { BiomedicaAuthContext } from './biomedicaAuthContext';
 import { refreshBiomedica } from './biomedica-session';
@@ -7,20 +8,27 @@ import { setBiomedicaToken } from './biomedicaToken';
 
 export function BiomedicaAuthProvider({ children }: { children: ReactNode }) {
   const [biomedica, setBiomedica] = useState<BiomedicaResponse | null>(null);
-  const [carregando, setCarregando] = useState(true);
+  const [carregando, setCarregando] = useState(() => temSessao(CHAVE_SESSAO.biomedica));
 
   useEffect(() => {
     let ativo = true;
-    refreshBiomedica()
-      .then((sessao) => {
-        if (ativo) setBiomedica(sessao.biomedica);
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        if (ativo) setCarregando(false);
-      });
+    if (temSessao(CHAVE_SESSAO.biomedica)) {
+      refreshBiomedica()
+        .then((sessao) => {
+          if (ativo) setBiomedica(sessao.biomedica);
+        })
+        .catch(() => {
+          limparSessao(CHAVE_SESSAO.biomedica);
+        })
+        .finally(() => {
+          if (ativo) setCarregando(false);
+        });
+    }
 
-    const aoDeslogar = () => setBiomedica(null);
+    const aoDeslogar = () => {
+      limparSessao(CHAVE_SESSAO.biomedica);
+      setBiomedica(null);
+    };
     window.addEventListener('biomedica:logout', aoDeslogar);
     return () => {
       ativo = false;
@@ -31,6 +39,7 @@ export function BiomedicaAuthProvider({ children }: { children: ReactNode }) {
   async function login(email: string, senha: string): Promise<void> {
     const sessao = await biomedicaApi.login(email, senha);
     setBiomedicaToken(sessao.accessToken);
+    marcarSessao(CHAVE_SESSAO.biomedica);
     setBiomedica(sessao.biomedica);
   }
 
@@ -39,6 +48,7 @@ export function BiomedicaAuthProvider({ children }: { children: ReactNode }) {
       await biomedicaApi.logout();
     } finally {
       setBiomedicaToken(null);
+      limparSessao(CHAVE_SESSAO.biomedica);
       setBiomedica(null);
     }
   }

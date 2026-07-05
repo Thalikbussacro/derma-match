@@ -20,39 +20,6 @@ type Executar = (fn: () => Promise<void>) => Promise<boolean>;
 const inputBase =
   'rounded-lg border border-neutral-200 px-2 py-1.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-200';
 
-function PesoInput({
-  opcaoId,
-  tipo,
-  valor,
-  executar,
-}: {
-  opcaoId: number;
-  tipo: RascunhoTipoPele;
-  valor: number;
-  executar: Executar;
-}) {
-  const [peso, setPeso] = useState(String(valor));
-  return (
-    <label className="flex items-center gap-1 text-xs">
-      <span className="w-16 truncate capitalize text-neutral-500">{tipo.nome}</span>
-      <input
-        type="number"
-        min={0}
-        max={20}
-        value={peso}
-        onChange={(e) => setPeso(e.target.value)}
-        onBlur={() => {
-          const n = Number(peso);
-          if (Number.isInteger(n) && n >= 0 && n !== valor) {
-            void executar(() => adminApi.definirPeso({ opcaoId, tipoPeleId: tipo.id, peso: n }));
-          }
-        }}
-        className={`w-12 text-center ${inputBase}`}
-      />
-    </label>
-  );
-}
-
 function OpcaoEditor({
   opcao,
   tipos,
@@ -65,7 +32,13 @@ function OpcaoEditor({
   executar: Executar;
 }) {
   const [texto, setTexto] = useState(opcao.texto);
-  const pesoDe = (tipoId: number) => opcao.pesos.find((p) => p.tipoPeleId === tipoId)?.peso ?? 0;
+  const [pesos, setPesos] = useState<Record<number, string>>(() => {
+    const inicial: Record<number, string> = {};
+    for (const t of tipos) {
+      inicial[t.id] = String(opcao.pesos.find((p) => p.tipoPeleId === t.id)?.peso ?? 0);
+    }
+    return inicial;
+  });
   const sugerido = (produtoId: number) => opcao.produtosSugeridos.includes(produtoId);
 
   function toggleProduto(produtoId: number) {
@@ -76,6 +49,20 @@ function OpcaoEditor({
     );
   }
 
+  // Salva o texto e os pesos que mudaram, tudo de uma vez.
+  async function salvar() {
+    await executar(async () => {
+      await adminApi.atualizarOpcao(opcao.id, texto);
+      for (const t of tipos) {
+        const n = Number(pesos[t.id]);
+        const atual = opcao.pesos.find((p) => p.tipoPeleId === t.id)?.peso ?? 0;
+        if (Number.isInteger(n) && n >= 0 && n !== atual) {
+          await adminApi.definirPeso({ opcaoId: opcao.id, tipoPeleId: t.id, peso: n });
+        }
+      }
+    });
+  }
+
   return (
     <div className="rounded-xl border border-neutral-100 bg-neutral-50 p-3">
       <div className="flex items-center gap-2">
@@ -84,10 +71,7 @@ function OpcaoEditor({
           onChange={(e) => setTexto(e.target.value)}
           className={`flex-1 ${inputBase}`}
         />
-        <Button
-          variant="secondary"
-          onClick={() => void executar(() => adminApi.atualizarOpcao(opcao.id, texto))}
-        >
+        <Button variant="secondary" onClick={() => void salvar()}>
           Salvar
         </Button>
         <Button
@@ -97,16 +81,20 @@ function OpcaoEditor({
           Remover
         </Button>
       </div>
-      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
         <span className="text-xs font-bold text-neutral-400">Pesos:</span>
         {tipos.map((t) => (
-          <PesoInput
-            key={t.id}
-            opcaoId={opcao.id}
-            tipo={t}
-            valor={pesoDe(t.id)}
-            executar={executar}
-          />
+          <label key={t.id} className="flex items-center gap-1 text-xs">
+            <span className="w-16 truncate capitalize text-neutral-500">{t.nome}</span>
+            <input
+              type="number"
+              min={0}
+              max={20}
+              value={pesos[t.id] ?? '0'}
+              onChange={(e) => setPesos((prev) => ({ ...prev, [t.id]: e.target.value }))}
+              className={`w-12 text-center ${inputBase}`}
+            />
+          </label>
         ))}
       </div>
       {produtos.length > 0 && (
@@ -125,6 +113,7 @@ function OpcaoEditor({
           ))}
         </div>
       )}
+      <p className="mt-2 text-xs text-neutral-400">Texto e pesos são gravados no botão “Salvar”.</p>
     </div>
   );
 }
