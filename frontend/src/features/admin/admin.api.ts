@@ -119,6 +119,9 @@ export const adminApi = {
   async desassociarProduto(input: AssociarProdutoInput): Promise<void> {
     await apiAdmin.post('/admin/produtos/desassociar', input);
   },
+  async deletarProduto(id: number): Promise<void> {
+    await apiAdmin.delete(`/admin/produtos/${id}`);
+  },
 
   // --- Conversas (atribuição) ---
   async conversas(): Promise<ConversaAdmin[]> {

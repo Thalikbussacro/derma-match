@@ -21,6 +21,7 @@ const ETAPA_LABEL: Record<Etapa, string> = {
 const inputBase =
   'rounded-lg border border-neutral-200 px-2 py-1.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-200';
 const acaoBtn = 'text-sm font-bold text-brand-600 transition-colors hover:text-brand-700';
+const acaoBtnPerigo = 'text-sm font-bold text-red-600 transition-colors hover:text-red-700';
 
 type Executar = (fn: () => Promise<void>) => Promise<boolean>;
 
@@ -102,6 +103,7 @@ export function AdminProdutosPage() {
   const invalidar = useInvalidarProdutos();
   const [erro, setErro] = useState<string | null>(null);
   const [editando, setEditando] = useState<number | null>(null);
+  const [confirmandoExclusao, setConfirmandoExclusao] = useState<number | null>(null);
   const [nome, setNome] = useState('');
   const [marca, setMarca] = useState('');
   const [etapa, setEtapa] = useState<Etapa>('LIMPEZA');
@@ -220,7 +222,10 @@ export function AdminProdutosPage() {
                   <button
                     type="button"
                     className={acaoBtn}
-                    onClick={() => setEditando(editando === p.id ? null : p.id)}
+                    onClick={() => {
+                      setConfirmandoExclusao(null);
+                      setEditando(editando === p.id ? null : p.id);
+                    }}
                   >
                     {editando === p.id ? 'Fechar' : 'Editar'}
                   </button>
@@ -233,6 +238,16 @@ export function AdminProdutosPage() {
                   >
                     {p.ativo ? 'Desativar' : 'Ativar'}
                   </button>
+                  <button
+                    type="button"
+                    className={acaoBtnPerigo}
+                    onClick={() => {
+                      setEditando(null);
+                      setConfirmandoExclusao(p.id);
+                    }}
+                  >
+                    Deletar
+                  </button>
                 </div>
               </Td>
             </tr>
@@ -244,6 +259,36 @@ export function AdminProdutosPage() {
                     executar={executar}
                     aoFechar={() => setEditando(null)}
                   />
+                </td>
+              </tr>
+            )}
+            {confirmandoExclusao === p.id && (
+              <tr className="bg-red-50">
+                <td colSpan={5} className="px-4 py-4">
+                  <div className="flex flex-col gap-3">
+                    <p className="text-sm text-neutral-700">
+                      Excluir <span className="font-bold">{p.nome}</span> em definitivo. Ele deixa de
+                      ser sugerido no questionário e some das rotinas de pacientes onde já foi
+                      indicado. Não dá pra desfazer.
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="danger"
+                        onClick={() =>
+                          void executar(() => adminApi.deletarProduto(p.id)).then((ok) => {
+                            if (ok) {
+                              setConfirmandoExclusao(null);
+                            }
+                          })
+                        }
+                      >
+                        Sim, excluir
+                      </Button>
+                      <Button variant="ghost" onClick={() => setConfirmandoExclusao(null)}>
+                        Cancelar
+                      </Button>
+                    </div>
+                  </div>
                 </td>
               </tr>
             )}
