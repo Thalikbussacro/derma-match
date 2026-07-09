@@ -55,4 +55,17 @@ export const adminProdutoController = {
       next(err);
     }
   },
+
+  remover: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id)) {
+        throw new NotFoundError('Produto');
+      }
+      await adminProdutoService.remover(id);
+      res.status(204).end();
+    } catch (err) {
+      next(err);
+    }
+  },
 };

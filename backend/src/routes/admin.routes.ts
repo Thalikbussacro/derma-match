@@ -61,6 +61,7 @@ adminRouter.post('/produtos', exigirAdmin, adminProdutoController.criar);
 adminRouter.patch('/produtos/:id', exigirAdmin, adminProdutoController.atualizar);
 adminRouter.post('/produtos/associar', exigirAdmin, adminProdutoController.associar);
 adminRouter.post('/produtos/desassociar', exigirAdmin, adminProdutoController.desassociar);
+adminRouter.delete('/produtos/:id', exigirAdmin, adminProdutoController.remover);
 
 // Conversas (atribuição).
 adminRouter.get('/conversas', exigirAdmin, adminConversaController.listar);

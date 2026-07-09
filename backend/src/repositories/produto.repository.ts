@@ -23,6 +23,10 @@ export const produtoRepository = {
     return prisma.produto.update({ where: { id }, data });
   },
 
+  remover(id: number): Promise<Produto> {
+    return prisma.produto.delete({ where: { id } });
+  },
+
   associar(opcaoId: number, produtoId: number) {
     return prisma.opcaoProdutoSugerido.upsert({
       where: { opcaoId_produtoId: { opcaoId, produtoId } },

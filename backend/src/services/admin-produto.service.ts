@@ -64,4 +64,12 @@ export const adminProdutoService = {
   async desassociar(input: AssociarProdutoInput): Promise<void> {
     await produtoRepository.desassociar(input.opcaoId, input.produtoId);
   },
+
+  async remover(id: number): Promise<void> {
+    const existente = await produtoRepository.buscarPorId(id);
+    if (!existente) {
+      throw new NotFoundError('Produto');
+    }
+    await produtoRepository.remover(id);
+  },
 };
