@@ -8,6 +8,7 @@ describe('questionarioAdminService.removerPergunta', () => {
 
     // Remove uma pergunta do meio para forçar buraco na ordem.
     const meio = antes.perguntas[Math.floor(antes.perguntas.length / 2)];
+    if (!meio) throw new Error('pergunta do meio não encontrada');
     await questionarioAdminService.removerPergunta(meio.id);
 
     const depois = await questionarioAdminService.obterRascunho();
